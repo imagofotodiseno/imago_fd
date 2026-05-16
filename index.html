@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Imago Social Media Agent | Command Center</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet">
+    <style>
+        :root {
+            --primary: #3b82f6;
+            --accent: #8b5cf6;
+            --bg-dark: #020617;
+            --card-bg: #0f172a;
+        }
+
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: var(--bg-dark);
+            color: #f8fafc;
+            overflow: hidden;
+        }
+
+        .glass {
+            background: rgba(15, 23, 42, 0.6);
+            backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .sidebar-item.active {
+            background: rgba(59, 130, 246, 0.1);
+            color: #60a5fa;
+            border-right: 3px solid #3b82f6;
+        }
+
+        .glass-card {
+            background: rgba(15, 23, 42, 0.4);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .typing-indicator span {
+            height: 4px;
+            width: 4px;
+            background: #94a3b8;
+            display: inline-block;
+            border-radius: 50%;
+            margin: 0 1px;
+            animation: bounce 1.3s infinite;
+        }
+
+        @keyframes bounce {
+
+            0%,
+            60%,
+            100% {
+                transform: translateY(0);
+            }
+
+            30% {
+                transform: translateY(-4px);
+            }
+        }
+
+        ::-webkit-scrollbar {
+            width: 5px;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #334155;
+            border-radius: 10px;
+        }
+    </style>
+</head>
+
+<body class="h-screen flex">
+
+    <aside class="w-64 border-r border-slate-800 flex flex-col bg-[#020617] z-20">
+        <div class="p-6 border-b border-slate-800">
+            <div class="flex items-center gap-3">
+                <div
+                    class="w-10 h-10 bg-gradient-to-tr from-blue-600 to-violet-600 rounded-xl flex items-center justify-center">
+                    <i class="fas fa-rocket text-white"></i>
+                </div>
+                <div>
+                    <h1 class="font-bold text-lg leading-none">IMAGO</h1>
+                    <span class="text-[10px] text-blue-400 font-bold tracking-widest uppercase">Social Agent</span>
+                </div>
+            </div>
+        </div>
+
+        <nav class="flex-grow p-4 space-y-2 mt-4">
+            <button onclick="showView('dashboard')"
+                class="nav-btn sidebar-item active w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all">
+                <i class="fas fa-th-large w-5"></i> Dashboard
+            </button>
+            <button onclick="showView('chat')"
+                class="nav-btn sidebar-item w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all">
+                <i class="fas fa-comment-alt w-5"></i> Agente Estratega
+            </button>
+            <button onclick="showView('ads')"
+                class="nav-btn sidebar-item w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all">
+                <i class="fas fa-ad w-5"></i> Creador de Anuncios
+            </button>
+            <button onclick="setupApiKey()"
+                class="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium text-amber-400 hover:bg-amber-400/10 transition-all mt-auto">
+                <i class="fas fa-key w-5"></i> Configurar API Key
+            </button>
+        </nav>
+    </aside>
+
+    <main class="flex-grow relative overflow-hidden flex flex-col bg-slate-950">
+        <header class="h-16 border-b border-slate-800 flex items-center justify-between px-8 bg-slate-900/20">
+            <div id="viewTitle" class="text-sm font-semibold text-slate-300 uppercase tracking-widest">Dashboard</div>
+        </header>
+
+        <div id="views" class="flex-grow overflow-y-auto p-8">
+            <!-- Dashboard -->
+            <div id="view-dashboard" class="content-view space-y-8">
+                <div class="glass-card p-6 rounded-3xl border-l-4 border-l-blue-500">
+                    <h3 class="font-bold">Investigación de Mercado</h3>
+                    <p class="text-xs text-slate-400 mb-4">Pulsa para buscar tendencias en Google.</p>
+                    <button onclick="runMarketResearch()" id="researchBtn"
+                        class="bg-blue-600 hover:bg-blue-500 px-6 py-2 rounded-xl text-xs font-bold">Analizar Medellín
+                        2024</button>
+                    <div id="researchResult"
+                        class="hidden mt-6 p-4 bg-slate-900 rounded-2xl text-sm text-slate-300 border border-slate-800">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Chat -->
+            <div id="view-chat" class="content-view hidden flex flex-col h-full max-w-4xl mx-auto">
+                <div id="chatMessages" class="flex-grow space-y-4 overflow-y-auto pb-4">
+                    <div class="flex gap-3">
+                        <div class="w-8 h-8 rounded-lg bg-blue-600 flex items-center justify-center shrink-0"><i
+                                class="fas fa-robot text-xs"></i></div>
+                        <div
+                            class="bg-slate-900 border border-slate-800 p-4 rounded-2xl rounded-tl-none text-sm max-w-[85%]">
+                            ¡Hola! Soy tu Agente Imago. ¿En qué proyecto de marketing trabajamos hoy?
+                        </div>
+                    </div>
+                </div>
+                <form id="chatForm"
+                    class="p-4 bg-slate-900 border border-slate-800 rounded-3xl mt-4 flex items-center gap-3">
+                    <input type="text" id="chatInput" placeholder="Escribe tu estrategia..."
+                        class="flex-grow bg-transparent border-none outline-none text-sm">
+                    <button type="submit" class="w-10 h-10 bg-blue-600 rounded-xl flex items-center justify-center"><i
+                            class="fas fa-paper-plane"></i></button>
+                </form>
+            </div>
+
+            <!-- Ads -->
+            <div id="view-ads" class="content-view hidden max-w-4xl mx-auto">
+                <div class="glass p-8 rounded-[2rem] space-y-6">
+                    <h2 class="text-2xl font-bold">Generador AIDA</h2>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div class="space-y-4">
+                            <input type="text" id="adService" placeholder="Servicio (ej. Fotografía)"
+                                class="w-full bg-slate-900 border border-slate-800 p-4 rounded-2xl text-sm">
+                            <button onclick="generateAdCopy()"
+                                class="w-full bg-blue-600 py-4 rounded-2xl font-bold">Generar Copy</button>
+                        </div>
+                        <div id="adResult"
+                            class="bg-slate-950 border border-slate-800 rounded-3xl p-6 text-sm text-slate-400">
+                            Resultado...</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        let apiKey = localStorage.getItem('imago_gemini_key') || "";
+
+        function setupApiKey() {
+            const key = prompt("Pega tu API Key de Gemini aquí (Se guardará localmente en tu navegador):", apiKey);
+            if (key) {
+                apiKey = key;
+                localStorage.setItem('imago_gemini_key', key);
+                alert("API Key guardada correctamente.");
+            }
+        }
+
+        function showView(viewId) {
+            document.querySelectorAll('.content-view').forEach(v => v.classList.add('hidden'));
+            document.getElementById(`view-${viewId}`).classList.remove('hidden');
+            document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.remove('active'));
+            event.currentTarget.classList.add('active');
+            document.getElementById('viewTitle').innerText = viewId.toUpperCase();
+        }
+
+        async function fetchGemini(prompt, system = "", useSearch = false) {
+            if (!apiKey) {
+                alert("Por favor, configura tu API Key primero.");
+                setupApiKey();
+                return;
+            }
+            const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
+            const body = {
+                contents: [{ role: 'user', parts: [{ text: prompt }] }],
+                systemInstruction: { parts: [{ text: system }] }
+            };
+            if (useSearch) body.tools = [{ "google_search": {} }];
+
+            const response = await fetch(url, { method: 'POST', body: JSON.stringify(body) });
+            const data = await response.json();
+            return data.candidates[0].content.parts[0].text;
+        }
+
+        const chatForm = document.getElementById('chatForm');
+        chatForm.onsubmit = async (e) => {
+            e.preventDefault();
+            const input = document.getElementById('chatInput');
+            const text = input.value.trim();
+            if (!text) return;
+
+            addChatMessage(text, true);
+            input.value = '';
+
+            try {
+                const response = await fetchGemini(text, "Eres el estratega de marketing de Imago Fotodiseño.");
+                addChatMessage(response);
+            } catch (err) {
+                addChatMessage("Error: Verifica tu API Key.");
+            }
+        };
+
+        function addChatMessage(content, isUser = false) {
+            const msg = document.createElement('div');
+            msg.className = `flex gap-3 ${isUser ? 'flex-row-reverse' : ''}`;
+            msg.innerHTML = `
+            <div class="w-8 h-8 rounded-lg ${isUser ? 'bg-slate-700' : 'bg-blue-600'} flex items-center justify-center shrink-0">
+                <i class="fas fa-${isUser ? 'user' : 'robot'} text-xs"></i>
+            </div>
+            <div class="${isUser ? 'bg-blue-600' : 'bg-slate-900 border border-slate-800'} p-4 rounded-2xl text-sm max-w-[85%]">
+                ${content}
+            </div>`;
+            document.getElementById('chatMessages').appendChild(msg);
+        }
+
+        async function runMarketResearch() {
+            const res = document.getElementById('researchResult');
+            res.classList.remove('hidden');
+            res.innerText = "Buscando tendencias...";
+            const data = await fetchGemini("Tendencias de marketing y diseño en Medellín hoy", "Analista", true);
+            res.innerText = data;
+        }
+
+        async function generateAdCopy() {
+            const service = document.getElementById('adService').value;
+            const res = document.getElementById('adResult');
+            res.innerText = "Redactando...";
+            const data = await fetchGemini(`Crea un anuncio AIDA para ${service}`, "Copywriter");
+            res.innerText = data;
+        }
+    </script>
+</body>
+
+</html>
