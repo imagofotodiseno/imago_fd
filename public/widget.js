@@ -10,7 +10,7 @@
     const styleLink = document.createElement('link');
     styleLink.rel = 'stylesheet';
     // Asume que está siendo servido por el backend
-    styleLink.href = 'http://localhost:3000/widget.css';
+    styleLink.href = '/widget.css';
     document.head.appendChild(styleLink);
 
     // 2. Build HTML Structure
@@ -96,7 +96,7 @@
 
         try {
             // Reemplazar localhost por tu dominio real en producción
-            const response = await fetch('http://localhost:3000/api/chat/web', {
+            const response = await fetch('/api/chat/web', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({

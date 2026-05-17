@@ -61,3 +61,51 @@ body {
     background: #334155;
     border-radius: 10px;
 }
+
+/* ── Kanban ── */
+.kanban-col {
+    background: rgba(15, 23, 42, 0.3);
+    border: 1px solid rgba(255,255,255,0.04);
+    border-radius: 1.5rem;
+    padding: 1.25rem;
+    min-height: 500px;
+}
+
+.drag-over-target {
+    background: rgba(59, 130, 246, 0.06);
+    border: 2px dashed rgba(59, 130, 246, 0.3);
+    border-radius: 1rem;
+}
+
+.kanban-card {
+    transition: transform 0.15s ease, box-shadow 0.15s ease, border-color 0.15s ease;
+}
+
+.kanban-card:active {
+    cursor: grabbing;
+    transform: rotate(1deg) scale(1.02);
+    box-shadow: 0 20px 40px rgba(0,0,0,0.5);
+}
+
+/* ── Inbox layout ── */
+#view-inbox {
+    height: calc(100vh - 4rem); /* resta el header */
+    overflow: hidden;
+}
+
+#inbox-chat {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+}
+
+#inbox-messages {
+    flex: 1;
+    overflow-y: auto;
+}
+
+/* Sidebar item hover */
+.sidebar-item:not(.active):hover {
+    background: rgba(255,255,255,0.04);
+    color: #e2e8f0;
+}
