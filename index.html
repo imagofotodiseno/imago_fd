@@ -95,15 +95,15 @@
         <nav class="flex-grow p-4 space-y-2 mt-4">
             <button onclick="showView('dashboard')"
                 class="nav-btn sidebar-item active w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all">
-                <i class="fas fa-th-large w-5"></i> Dashboard
+                <i class="fas fa-chart-pie w-5"></i> Panel Estratégico
             </button>
             <button onclick="showView('chat')"
                 class="nav-btn sidebar-item w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all">
-                <i class="fas fa-comment-alt w-5"></i> Agente Estratega
+                <i class="fas fa-robot w-5"></i> Chatbot Experto
             </button>
             <button onclick="showView('ads')"
                 class="nav-btn sidebar-item w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all">
-                <i class="fas fa-ad w-5"></i> Creador de Anuncios
+                <i class="fas fa-bullhorn w-5"></i> Meta Ads Copywriter
             </button>
             <button onclick="setupApiKey()"
                 class="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium text-amber-400 hover:bg-amber-400/10 transition-all mt-auto">
@@ -120,16 +120,27 @@
         <div id="views" class="flex-grow overflow-y-auto p-8">
             <!-- Dashboard -->
             <div id="view-dashboard" class="content-view space-y-8">
-                <div class="glass-card p-6 rounded-3xl border-l-4 border-l-blue-500">
-                    <h3 class="font-bold">Investigación de Mercado</h3>
-                    <p class="text-xs text-slate-400 mb-4">Pulsa para buscar tendencias en Google.</p>
-                    <button onclick="runMarketResearch()" id="researchBtn"
-                        class="bg-blue-600 hover:bg-blue-500 px-6 py-2 rounded-xl text-xs font-bold">Analizar Medellín
-                        2024</button>
-                    <div id="researchResult"
-                        class="hidden mt-6 p-4 bg-slate-900 rounded-2xl text-sm text-slate-300 border border-slate-800">
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div class="glass-card p-6 rounded-3xl border-l-4 border-l-blue-500 flex flex-col hover:scale-[1.02] transition-transform">
+                        <div class="bg-blue-500/20 w-10 h-10 rounded-xl flex items-center justify-center mb-4"><i class="fas fa-search text-blue-400"></i></div>
+                        <h3 class="font-bold">Investigación</h3>
+                        <p class="text-xs text-slate-400 mb-6 flex-grow">Busca tendencias de mercado y pauta.</p>
+                        <button onclick="runMarketResearch()" class="bg-blue-600 hover:bg-blue-500 py-3 rounded-xl text-xs font-bold w-full transition-colors">Analizar Tendencias</button>
+                    </div>
+                    <div class="glass-card p-6 rounded-3xl border-l-4 border-l-purple-500 flex flex-col hover:scale-[1.02] transition-transform">
+                        <div class="bg-purple-500/20 w-10 h-10 rounded-xl flex items-center justify-center mb-4"><i class="fas fa-users text-purple-400"></i></div>
+                        <h3 class="font-bold">Públicos Meta</h3>
+                        <p class="text-xs text-slate-400 mb-6 flex-grow">Define Buyer Personas y segmentaciones.</p>
+                        <button onclick="generateAudience()" class="bg-purple-600 hover:bg-purple-500 py-3 rounded-xl text-xs font-bold w-full transition-colors">Definir Público</button>
+                    </div>
+                    <div class="glass-card p-6 rounded-3xl border-l-4 border-l-pink-500 flex flex-col hover:scale-[1.02] transition-transform">
+                        <div class="bg-pink-500/20 w-10 h-10 rounded-xl flex items-center justify-center mb-4"><i class="fas fa-layer-group text-pink-400"></i></div>
+                        <h3 class="font-bold">Estrategia</h3>
+                        <p class="text-xs text-slate-400 mb-6 flex-grow">Crea pilares de contenido para redes.</p>
+                        <button onclick="generateContentStrategy()" class="bg-pink-600 hover:bg-pink-500 py-3 rounded-xl text-xs font-bold w-full transition-colors">Generar Estrategia</button>
                     </div>
                 </div>
+                <div id="dashboardResult" class="hidden p-6 glass-card rounded-3xl text-sm text-slate-300 border border-slate-800 whitespace-pre-wrap leading-relaxed shadow-xl"></div>
             </div>
 
             <!-- Chat -->
@@ -154,19 +165,35 @@
             </div>
 
             <!-- Ads -->
-            <div id="view-ads" class="content-view hidden max-w-4xl mx-auto">
+            <div id="view-ads" class="content-view hidden max-w-5xl mx-auto w-full">
                 <div class="glass p-8 rounded-[2rem] space-y-6">
-                    <h2 class="text-2xl font-bold">Generador AIDA</h2>
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <div class="space-y-4">
-                            <input type="text" id="adService" placeholder="Servicio (ej. Fotografía)"
-                                class="w-full bg-slate-900 border border-slate-800 p-4 rounded-2xl text-sm">
+                    <div>
+                        <h2 class="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-purple-500">Generador de Meta Ads</h2>
+                        <p class="text-slate-400 text-sm mt-2">Crea copys persuasivos optimizados para conversión en Facebook e Instagram.</p>
+                    </div>
+                    <div class="grid grid-cols-1 lg:grid-cols-5 gap-8">
+                        <div class="space-y-4 lg:col-span-2">
+                            <div>
+                                <label class="text-xs font-bold text-slate-400 mb-1 block uppercase tracking-wider">Producto o Servicio</label>
+                                <input type="text" id="adService" placeholder="Ej. Sesión de fotos gastronómica"
+                                    class="w-full bg-slate-900 border border-slate-800 focus:border-blue-500 outline-none p-4 rounded-2xl text-sm transition-colors">
+                            </div>
+                            <div>
+                                <label class="text-xs font-bold text-slate-400 mb-1 block uppercase tracking-wider">Público Objetivo</label>
+                                <input type="text" id="adAudience" placeholder="Ej. Restaurantes en Medellín"
+                                    class="w-full bg-slate-900 border border-slate-800 focus:border-purple-500 outline-none p-4 rounded-2xl text-sm transition-colors">
+                            </div>
                             <button onclick="generateAdCopy()"
-                                class="w-full bg-blue-600 py-4 rounded-2xl font-bold">Generar Copy</button>
+                                class="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-500 hover:to-purple-500 py-4 rounded-2xl font-bold shadow-lg shadow-blue-900/20 transition-all hover:scale-[1.02]">
+                                <i class="fas fa-magic mr-2"></i> Generar Copy Persuasivo
+                            </button>
                         </div>
                         <div id="adResult"
-                            class="bg-slate-950 border border-slate-800 rounded-3xl p-6 text-sm text-slate-400">
-                            Resultado...</div>
+                            class="bg-slate-950 border border-slate-800 rounded-3xl p-6 text-sm text-slate-300 lg:col-span-3 whitespace-pre-wrap overflow-y-auto max-h-[500px] leading-relaxed relative min-h-[200px]">
+                            <div class="absolute inset-0 flex items-center justify-center text-slate-600 p-6 text-center">
+                                Completa los datos y presiona generar para crear tu anuncio AIDA...
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -239,7 +266,7 @@
             input.value = '';
 
             try {
-                const response = await fetchGemini(text, "Eres el estratega de marketing de Imago Fotodiseño.");
+                const response = await fetchGemini(text, "Eres un estratega experto en pauta publicitaria (Meta Ads) y redes sociales para la marca Imago Fotodiseño. Tu objetivo es ayudar a crear planes de marketing integrales, definir públicos y proponer campañas de alto impacto.");
                 addChatMessage(response);
             } catch (err) {
                 console.error("Chat error:", err);
@@ -251,21 +278,46 @@
             const msg = document.createElement('div');
             msg.className = `flex gap-3 ${isUser ? 'flex-row-reverse' : ''}`;
             msg.innerHTML = `
-            <div class="w-8 h-8 rounded-lg ${isUser ? 'bg-slate-700' : 'bg-blue-600'} flex items-center justify-center shrink-0">
-                <i class="fas fa-${isUser ? 'user' : 'robot'} text-xs"></i>
+            <div class="w-8 h-8 rounded-lg ${isUser ? 'bg-slate-700' : 'bg-gradient-to-br from-blue-600 to-purple-600'} flex items-center justify-center shrink-0 shadow-lg">
+                <i class="fas fa-${isUser ? 'user' : 'robot'} text-xs text-white"></i>
             </div>
-            <div class="${isUser ? 'bg-blue-600' : 'bg-slate-900 border border-slate-800'} p-4 rounded-2xl text-sm max-w-[85%]">
+            <div class="${isUser ? 'bg-blue-600 text-white' : 'glass-card border border-slate-700 text-slate-200'} p-4 rounded-2xl text-sm max-w-[85%] whitespace-pre-wrap leading-relaxed shadow-sm">
                 ${content}
             </div>`;
             document.getElementById('chatMessages').appendChild(msg);
+            document.getElementById('chatMessages').scrollTop = document.getElementById('chatMessages').scrollHeight;
         }
 
         async function runMarketResearch() {
-            const res = document.getElementById('researchResult');
+            const res = document.getElementById('dashboardResult');
             res.classList.remove('hidden');
-            res.innerText = "Buscando tendencias...";
+            res.innerHTML = '<div class="flex items-center text-blue-400"><i class="fas fa-circle-notch fa-spin mr-3"></i> Analizando tendencias de mercado...</div>';
             try {
-                const data = await fetchGemini("Tendencias de marketing y diseño en Medellín hoy", "Analista", true);
+                const data = await fetchGemini("Analiza las tendencias actuales de marketing digital, pauta y diseño en Colombia para este mes. Dame un resumen en bullet points enfocado en lo que funciona ahora.", "Analista de Mercado", true);
+                res.innerText = data;
+            } catch (err) {
+                res.innerText = `Error: ${err.message}`;
+            }
+        }
+        
+        async function generateAudience() {
+            const res = document.getElementById('dashboardResult');
+            res.classList.remove('hidden');
+            res.innerHTML = '<div class="flex items-center text-purple-400"><i class="fas fa-circle-notch fa-spin mr-3"></i> Definiendo Buyer Personas...</div>';
+            try {
+                const data = await fetchGemini("Define 2 perfiles de público objetivo (Buyer Personas) ideales para servicios de fotografía de producto y diseño. Incluye: nombre ficticio, edad, intereses, dolores principales, y cómo Imago puede ayudarles.", "Experto en Audiencias");
+                res.innerText = data;
+            } catch (err) {
+                res.innerText = `Error: ${err.message}`;
+            }
+        }
+        
+        async function generateContentStrategy() {
+            const res = document.getElementById('dashboardResult');
+            res.classList.remove('hidden');
+            res.innerHTML = '<div class="flex items-center text-pink-400"><i class="fas fa-circle-notch fa-spin mr-3"></i> Creando estrategia de contenido...</div>';
+            try {
+                const data = await fetchGemini("Crea una estrategia de contenido mensual de 3 pilares para la marca Imago Fotodiseño en Instagram y TikTok. Orientada a atraer marcas que necesitan mejorar su estética visual. Incluye ejemplos de formatos.", "Content Strategist");
                 res.innerText = data;
             } catch (err) {
                 res.innerText = `Error: ${err.message}`;
@@ -274,10 +326,12 @@
 
         async function generateAdCopy() {
             const service = document.getElementById('adService').value;
+            const audience = document.getElementById('adAudience')?.value || 'público general';
             const res = document.getElementById('adResult');
-            res.innerText = "Redactando...";
+            res.classList.remove('relative');
+            res.innerHTML = '<div class="flex items-center justify-center h-full text-blue-400"><i class="fas fa-circle-notch fa-spin mr-3 text-2xl"></i> Redactando copy persuasivo...</div>';
             try {
-                const data = await fetchGemini(`Crea un anuncio AIDA para ${service}`, "Copywriter");
+                const data = await fetchGemini(`Crea un anuncio AIDA persuasivo para Meta Ads (Facebook/Instagram) sobre: "${service}". Dirigido a: "${audience}". Incluye: Emojis, un gancho (Hook) muy atractivo en la primera línea, descripción del valor/solución, y un Call to Action (CTA) claro.`, "Copywriter Experto en Meta Ads");
                 res.innerText = data;
             } catch (err) {
                 res.innerText = `Error: ${err.message}`;
