@@ -52,10 +52,15 @@ async function handleIncomingMessage(senderId, text, channel) {
         chatSessions[senderId].push({ role: 'assistant', content: responseText });
 
         // Enviar el mensaje de vuelta al usuario a través del canal correspondiente
-        await sendMessage(senderId, responseText, channel);
+        if (channel === 'web') {
+            return responseText;
+        } else {
+            await sendMessage(senderId, responseText, channel);
+        }
 
     } catch (error) {
         console.error('❌ Error en el orquestador:', error);
+        return "Hubo un error procesando tu mensaje.";
     }
 }
 
