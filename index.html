@@ -206,9 +206,26 @@
             };
             if (useSearch) body.tools = [{ "google_search": {} }];
 
-            const response = await fetch(url, { method: 'POST', body: JSON.stringify(body) });
+            const response = await fetch(url, { 
+                method: 'POST', 
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(body) 
+            });
             const data = await response.json();
-            return data.candidates[0].content.parts[0].text;
+            
+            if (!response.ok) {
+                console.error("API Error:", data);
+                throw new Error(data.error?.message || `Error en la API (${response.status})`);
+            }
+            
+            if (data.candidates && data.candidates.length > 0) {
+                return data.candidates[0].content.parts[0].text;
+            } else {
+                console.error("Respuesta inesperada:", data);
+                throw new Error("La API no devolvió una respuesta válida.");
+            }
         }
 
         const chatForm = document.getElementById('chatForm');
@@ -225,7 +242,8 @@
                 const response = await fetchGemini(text, "Eres el estratega de marketing de Imago Fotodiseño.");
                 addChatMessage(response);
             } catch (err) {
-                addChatMessage("Error: Verifica tu API Key.");
+                console.error("Chat error:", err);
+                addChatMessage(`Error: ${err.message || "Verifica tu API Key."}`);
             }
         };
 
@@ -246,16 +264,24 @@
             const res = document.getElementById('researchResult');
             res.classList.remove('hidden');
             res.innerText = "Buscando tendencias...";
-            const data = await fetchGemini("Tendencias de marketing y diseño en Medellín hoy", "Analista", true);
-            res.innerText = data;
+            try {
+                const data = await fetchGemini("Tendencias de marketing y diseño en Medellín hoy", "Analista", true);
+                res.innerText = data;
+            } catch (err) {
+                res.innerText = `Error: ${err.message}`;
+            }
         }
 
         async function generateAdCopy() {
             const service = document.getElementById('adService').value;
             const res = document.getElementById('adResult');
             res.innerText = "Redactando...";
-            const data = await fetchGemini(`Crea un anuncio AIDA para ${service}`, "Copywriter");
-            res.innerText = data;
+            try {
+                const data = await fetchGemini(`Crea un anuncio AIDA para ${service}`, "Copywriter");
+                res.innerText = data;
+            } catch (err) {
+                res.innerText = `Error: ${err.message}`;
+            }
         }
     </script>
 </body>
