@@ -62,9 +62,11 @@
                         <div class="bg-blue-500/20 w-10 h-10 rounded-xl flex items-center justify-center mb-4"><i
                                 class="fas fa-search text-blue-400"></i></div>
                         <h3 class="font-bold">Investigación</h3>
-                        <p class="text-xs text-slate-400 mb-6 flex-grow">Busca tendencias de mercado y pauta.</p>
+                        <p class="text-xs text-slate-400 mb-4">Busca tendencias y pasos a seguir.</p>
+                        <input type="text" id="researchInput" placeholder="Ej. Restaurantes en Colombia" 
+                            class="w-full bg-slate-900 border border-slate-800 p-3 rounded-xl text-xs mb-4 outline-none focus:border-blue-500 text-slate-200">
                         <button onclick="runMarketResearch()"
-                            class="bg-blue-600 hover:bg-blue-500 py-3 rounded-xl text-xs font-bold w-full transition-colors">Analizar
+                            class="bg-blue-600 hover:bg-blue-500 py-3 rounded-xl text-xs font-bold w-full transition-colors mt-auto">Analizar
                             Tendencias</button>
                     </div>
                     <div
@@ -72,9 +74,11 @@
                         <div class="bg-purple-500/20 w-10 h-10 rounded-xl flex items-center justify-center mb-4"><i
                                 class="fas fa-users text-purple-400"></i></div>
                         <h3 class="font-bold">Públicos Meta</h3>
-                        <p class="text-xs text-slate-400 mb-6 flex-grow">Define Buyer Personas y segmentaciones.</p>
+                        <p class="text-xs text-slate-400 mb-4">Define perfiles y cómo atacarlos.</p>
+                        <input type="text" id="audienceInput" placeholder="Ej. Menú digital para bares" 
+                            class="w-full bg-slate-900 border border-slate-800 p-3 rounded-xl text-xs mb-4 outline-none focus:border-purple-500 text-slate-200">
                         <button onclick="generateAudience()"
-                            class="bg-purple-600 hover:bg-purple-500 py-3 rounded-xl text-xs font-bold w-full transition-colors">Definir
+                            class="bg-purple-600 hover:bg-purple-500 py-3 rounded-xl text-xs font-bold w-full transition-colors mt-auto">Definir
                             Público</button>
                     </div>
                     <div
@@ -82,9 +86,11 @@
                         <div class="bg-pink-500/20 w-10 h-10 rounded-xl flex items-center justify-center mb-4"><i
                                 class="fas fa-layer-group text-pink-400"></i></div>
                         <h3 class="font-bold">Estrategia</h3>
-                        <p class="text-xs text-slate-400 mb-6 flex-grow">Crea pilares de contenido para redes.</p>
+                        <p class="text-xs text-slate-400 mb-4">Crea pilares y ruta de acción.</p>
+                        <input type="text" id="strategyInput" placeholder="Ej. Lanzamiento marca de ropa" 
+                            class="w-full bg-slate-900 border border-slate-800 p-3 rounded-xl text-xs mb-4 outline-none focus:border-pink-500 text-slate-200">
                         <button onclick="generateContentStrategy()"
-                            class="bg-pink-600 hover:bg-pink-500 py-3 rounded-xl text-xs font-bold w-full transition-colors">Generar
+                            class="bg-pink-600 hover:bg-pink-500 py-3 rounded-xl text-xs font-bold w-full transition-colors mt-auto">Generar
                             Estrategia</button>
                     </div>
                 </div>
@@ -247,11 +253,12 @@
         }
 
         async function runMarketResearch() {
+            const topic = document.getElementById('researchInput').value.trim() || "marketing digital y diseño en Colombia";
             const res = document.getElementById('dashboardResult');
             res.classList.remove('hidden');
-            res.innerHTML = '<div class="flex items-center text-blue-400"><i class="fas fa-circle-notch fa-spin mr-3"></i> Analizando tendencias de mercado...</div>';
+            res.innerHTML = '<div class="flex items-center text-blue-400"><i class="fas fa-circle-notch fa-spin mr-3"></i> Analizando tendencias...</div>';
             try {
-                const data = await fetchGemini("Analiza las tendencias actuales de marketing digital, pauta y diseño en Colombia para este mes. Dame un resumen en bullet points enfocado en lo que funciona ahora.", "Analista de Mercado", true);
+                const data = await fetchGemini(`Analiza las tendencias actuales sobre: "${topic}". Dame un resumen en bullet points de lo que funciona ahora y qué pasos exactos seguir para aprovechar estas tendencias.`, "Analista de Mercado", true);
                 res.innerText = data;
             } catch (err) {
                 res.innerText = `Error: ${err.message}`;
@@ -259,11 +266,12 @@
         }
 
         async function generateAudience() {
+            const topic = document.getElementById('audienceInput').value.trim() || "fotografía de producto y diseño";
             const res = document.getElementById('dashboardResult');
             res.classList.remove('hidden');
             res.innerHTML = '<div class="flex items-center text-purple-400"><i class="fas fa-circle-notch fa-spin mr-3"></i> Definiendo Buyer Personas...</div>';
             try {
-                const data = await fetchGemini("Define 2 perfiles de público objetivo (Buyer Personas) ideales para servicios de fotografía de producto y diseño. Incluye: nombre ficticio, edad, intereses, dolores principales, y cómo Imago puede ayudarles.", "Experto en Audiencias");
+                const data = await fetchGemini(`Define 2 perfiles de público objetivo (Buyer Personas) ideales para: "${topic}". Incluye: nombre, edad, intereses, dolores principales, y qué pasos estratégicos seguir para conectar con ellos y venderles.`, "Experto en Audiencias");
                 res.innerText = data;
             } catch (err) {
                 res.innerText = `Error: ${err.message}`;
@@ -271,11 +279,12 @@
         }
 
         async function generateContentStrategy() {
+            const topic = document.getElementById('strategyInput').value.trim() || "la marca Imago Fotodiseño en Instagram y TikTok";
             const res = document.getElementById('dashboardResult');
             res.classList.remove('hidden');
             res.innerHTML = '<div class="flex items-center text-pink-400"><i class="fas fa-circle-notch fa-spin mr-3"></i> Creando estrategia de contenido...</div>';
             try {
-                const data = await fetchGemini("Crea una estrategia de contenido mensual de 3 pilares para la marca Imago Fotodiseño en Instagram y TikTok. Orientada a atraer marcas que necesitan mejorar su estética visual. Incluye ejemplos de formatos.", "Content Strategist");
+                const data = await fetchGemini(`Crea una estrategia de contenido accionable para: "${topic}". Define 3 pilares de contenido y detalla una lista de pasos a seguir para ejecutar esta estrategia con éxito esta semana.`, "Content Strategist");
                 res.innerText = data;
             } catch (err) {
                 res.innerText = `Error: ${err.message}`;
