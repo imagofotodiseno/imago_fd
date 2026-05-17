@@ -8,10 +8,11 @@
   ],
   "routes": [
     { "src": "/api/chat/web", "dest": "api/chat.js" },
-    { "src": "/webhook", "dest": "api/webhook.js" },
-    { "src": "/widget.js", "dest": "public/widget.js" },
-    { "src": "/widget.css", "dest": "public/widget.css" },
-    { "src": "/style.css", "dest": "style.css" },
-    { "src": "/(.*)", "dest": "index.html" }
+    { "src": "/api/gemini",   "dest": "api/gemini.js" },
+    { "src": "/webhook",      "dest": "api/webhook.js" },
+    { "src": "/widget.js",    "dest": "public/widget.js" },
+    { "src": "/widget.css",   "dest": "public/widget.css" },
+    { "src": "/style.css",    "dest": "style.css" },
+    { "src": "/(.*)",         "dest": "index.html" }
   ]
 }

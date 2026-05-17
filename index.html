@@ -324,38 +324,22 @@
         }
 
         async function fetchGemini(prompt, system = "", useSearch = false) {
-            if (!apiKey) {
-                alert("Por favor, configura tu API Key primero.");
-                setupApiKey();
-                return;
-            }
-            const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`;
-            const body = {
-                contents: [{ role: 'user', parts: [{ text: prompt }] }],
-                systemInstruction: { parts: [{ text: system }] }
-            };
-            if (useSearch) body.tools = [{ "google_search": {} }];
-
+            const url = "/api/gemini";
             const response = await fetch(url, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
                 },
-                body: JSON.stringify(body)
+                body: JSON.stringify({ prompt, system, useSearch })
             });
             const data = await response.json();
 
             if (!response.ok) {
                 console.error("API Error:", data);
-                throw new Error(data.error?.message || `Error en la API (${response.status})`);
+                throw new Error(data.error || `Error en la API (${response.status})`);
             }
 
-            if (data.candidates && data.candidates.length > 0) {
-                return data.candidates[0].content.parts[0].text;
-            } else {
-                console.error("Respuesta inesperada:", data);
-                throw new Error("La API no devolvió una respuesta válida.");
-            }
+            return data.text;
         }
 
         const chatForm = document.getElementById('chatForm');

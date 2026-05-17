@@ -27,6 +27,34 @@ app.post('/api/chat/web', async (req, res) => {
     res.json({ reply });
 });
 
+// Endpoint para proxy de Gemini desde el Frontend
+const { GoogleGenAI } = require('@google/genai');
+app.post('/api/gemini', async (req, res) => {
+    try {
+        const { prompt, system, useSearch } = req.body;
+        if (!prompt) return res.status(400).json({ error: 'Falta prompt' });
+
+        const apiKey = process.env.GEMINI_API_KEY;
+        if (!apiKey) return res.status(500).json({ error: 'Falta GEMINI_API_KEY en variables de entorno locales' });
+
+        const ai = new GoogleGenAI({ apiKey });
+        const config = {};
+        if (system) config.systemInstruction = system;
+        if (useSearch) config.tools = [{ googleSearch: {} }];
+
+        const response = await ai.models.generateContent({
+            model: 'gemini-2.5-flash',
+            contents: prompt,
+            config: config
+        });
+
+        res.json({ text: response.text });
+    } catch (err) {
+        console.error('Error /api/gemini local:', err);
+        res.status(500).json({ error: err.message || 'Error interno' });
+    }
+});
+
 // Ruta de prueba
 app.get('/', (req, res) => {
     res.send('Servidor de Agentes Imago funcionando correctamente.');
