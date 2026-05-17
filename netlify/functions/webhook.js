@@ -2,7 +2,7 @@
 // Recibe eventos de WhatsApp Cloud API (Meta) y los procesa con Gemini.
 // Netlify.toml redirige /webhook → aquí.
 
-const { GoogleGenerativeAI } = require("@google/genai");
+const { GoogleGenAI } = require("@google/genai");
 const https = require("https");
 
 const chatSessions = {};
@@ -124,7 +124,7 @@ exports.handler = async function (event, context) {
     let replyText = "Hola, gracias por contactar a Imago. En breve te atendemos 🙌";
 
     if (apiKey) {
-      const ai = new GoogleGenerativeAI({ apiKey });
+      const ai = new GoogleGenAI({ apiKey });
       const history = chatSessions[senderId].slice(-20);
 
       const response = await ai.models.generateContent({

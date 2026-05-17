@@ -3,7 +3,7 @@
 // Se activa automáticamente en Netlify en la ruta /.netlify/functions/chat
 // El netlify.toml redirige /api/chat/web → aquí.
 
-const { GoogleGenerativeAI } = require("@google/genai");
+const { GoogleGenAI } = require("@google/genai");
 
 // Historial en memoria (por invocación). En producción escalar a Supabase/Redis.
 const chatSessions = {};
@@ -73,7 +73,7 @@ exports.handler = async function (event, context) {
     const history = chatSessions[senderId].slice(-20);
 
     // Llamar a Gemini
-    const ai = new GoogleGenerativeAI({ apiKey });
+    const ai = new GoogleGenAI({ apiKey });
     const model = ai.models;
 
     // Formato de la API de Gemini con historial y system instruction

@@ -3,7 +3,7 @@
 // Maneja verificación de Meta (GET) y mensajes de WhatsApp (POST)
 
 const https = require('https');
-const { GoogleGenerativeAI } = require('@google/genai');
+const { GoogleGenAI } = require('@google/genai');
 
 const chatSessions = {};
 
@@ -110,7 +110,7 @@ module.exports = async function handler(req, res) {
             chatSessions[senderId].push({ role: 'user', parts: [{ text }] });
             const history = chatSessions[senderId].slice(-20);
 
-            const ai = new GoogleGenerativeAI({ apiKey });
+            const ai = new GoogleGenAI({ apiKey });
             const response = await ai.models.generateContent({
                 model: 'gemini-2.5-flash',
                 config: { systemInstruction: SYSTEM_PROMPT },

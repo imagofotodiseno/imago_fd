@@ -2,7 +2,7 @@
 // Ruta pública: /api/chat  (vercel.json redirige /api/chat/web → aquí)
 // Compatible con @google/genai SDK v0.x
 
-const { GoogleGenerativeAI } = require('@google/genai');
+const { GoogleGenAI } = require('@google/genai');
 
 // Historial en memoria por sesión (por invocación de la función)
 const chatSessions = {};
@@ -58,7 +58,7 @@ module.exports = async function handler(req, res) {
         const history = chatSessions[senderId].slice(-20);
 
         // Llamar a Gemini
-        const ai = new GoogleGenerativeAI({ apiKey });
+        const ai = new GoogleGenAI({ apiKey });
         const response = await ai.models.generateContent({
             model: 'gemini-2.5-flash',
             config: { systemInstruction: SYSTEM_PROMPT },

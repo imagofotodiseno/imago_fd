@@ -1,11 +1,11 @@
 const axios = require('axios');
-const { GoogleGenerativeAI } = require('@google/genai');
+const { GoogleGenAI } = require('@google/genai');
 
 // Simulación de una base de datos en memoria para guardar el historial de chats
 const chatSessions = {};
 
 // Inicializa el cliente de Gemini si la API key existe
-const ai = process.env.GEMINI_API_KEY ? new GoogleGenerativeAI({ apiKey: process.env.GEMINI_API_KEY }) : null;
+const ai = process.env.GEMINI_API_KEY ? new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY }) : null;
 
 /**
  * Función principal que orquesta qué agente debe responder
