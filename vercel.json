@@ -1,27 +1,17 @@
 {
   "version": 2,
-  "rewrites": [
-    { "source": "/api/chat/web", "destination": "/api/chat" },
-    { "source": "/webhook",      "destination": "/api/webhook" },
-    { "source": "/widget.js",   "destination": "/public/widget.js" },
-    { "source": "/widget.css",  "destination": "/public/widget.css" }
+  "builds": [
+    { "src": "api/*.js", "use": "@vercel/node" },
+    { "src": "index.html", "use": "@vercel/static" },
+    { "src": "style.css", "use": "@vercel/static" },
+    { "src": "public/**", "use": "@vercel/static" }
   ],
-  "headers": [
-    {
-      "source": "/(.*)",
-      "headers": [
-        { "key": "X-Frame-Options",        "value": "SAMEORIGIN" },
-        { "key": "X-Content-Type-Options", "value": "nosniff" },
-        { "key": "X-XSS-Protection",       "value": "1; mode=block" },
-        { "key": "Referrer-Policy",        "value": "strict-origin-when-cross-origin" }
-      ]
-    },
-    {
-      "source": "/api/(.*)",
-      "headers": [
-        { "key": "Access-Control-Allow-Origin",  "value": "*" },
-        { "key": "Access-Control-Allow-Headers", "value": "Content-Type" }
-      ]
-    }
+  "routes": [
+    { "src": "/api/chat/web", "dest": "api/chat.js" },
+    { "src": "/webhook", "dest": "api/webhook.js" },
+    { "src": "/widget.js", "dest": "public/widget.js" },
+    { "src": "/widget.css", "dest": "public/widget.css" },
+    { "src": "/style.css", "dest": "style.css" },
+    { "src": "/(.*)", "dest": "index.html" }
   ]
 }
