@@ -1,1 +1,0 @@
-# imago_agente
