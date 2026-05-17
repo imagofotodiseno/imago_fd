@@ -1,0 +1,27 @@
+{
+  "version": 2,
+  "rewrites": [
+    { "source": "/api/chat/web", "destination": "/api/chat" },
+    { "source": "/webhook",      "destination": "/api/webhook" },
+    { "source": "/widget.js",   "destination": "/public/widget.js" },
+    { "source": "/widget.css",  "destination": "/public/widget.css" }
+  ],
+  "headers": [
+    {
+      "source": "/(.*)",
+      "headers": [
+        { "key": "X-Frame-Options",        "value": "SAMEORIGIN" },
+        { "key": "X-Content-Type-Options", "value": "nosniff" },
+        { "key": "X-XSS-Protection",       "value": "1; mode=block" },
+        { "key": "Referrer-Policy",        "value": "strict-origin-when-cross-origin" }
+      ]
+    },
+    {
+      "source": "/api/(.*)",
+      "headers": [
+        { "key": "Access-Control-Allow-Origin",  "value": "*" },
+        { "key": "Access-Control-Allow-Headers", "value": "Content-Type" }
+      ]
+    }
+  ]
+}
