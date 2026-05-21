@@ -1,6 +1,11 @@
 const axios = require('axios');
 const { openDatabase } = require('../db/client');
 
+const isDisabled = () => {
+  const v = process.env.DISABLE_META;
+  return v === '1' || v === 'true';
+};
+
 const getMetaConfig = async () => {
   const db = openDatabase();
   const config = await db.get('SELECT * FROM meta_config WHERE id = 1');
@@ -20,6 +25,7 @@ const saveMetaConfig = async ({ access_token, phone_number_id, waba_id }) => {
 };
 
 const pingMeta = async ({ access_token, phone_number_id }) => {
+  if (isDisabled()) return { disabled: true };
   const url = `https://graph.facebook.com/v17.0/${phone_number_id}`;
   const params = {
     access_token,
@@ -30,6 +36,7 @@ const pingMeta = async ({ access_token, phone_number_id }) => {
 };
 
 const syncTemplates = async ({ access_token, waba_id }) => {
+  if (isDisabled()) return [];
   const url = `https://graph.facebook.com/v17.0/${waba_id}/message_templates`;
   const params = {
     access_token,
@@ -52,6 +59,10 @@ const syncTemplates = async ({ access_token, waba_id }) => {
 };
 
 const sendWhatsAppMessage = async ({ access_token, phone_number_id, to, templateName, language = 'es', components = [] }) => {
+  if (isDisabled()) {
+    console.log('[meta-service] DISABLED - skipping sendWhatsAppMessage', { to, templateName, language, components });
+    return { disabled: true };
+  }
   const url = `https://graph.facebook.com/v17.0/${phone_number_id}/messages`;
   const payload = {
     messaging_product: 'whatsapp',
