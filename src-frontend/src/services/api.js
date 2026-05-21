@@ -1,7 +1,17 @@
 const BASE = '/api';
 
 const request = async (path, options = {}) => {
-  const res = await fetch(path, { headers: { 'Content-Type': options.body instanceof FormData ? undefined : 'application/json' }, body: options.body instanceof FormData ? options.body : options.body ? JSON.stringify(options.body) : undefined, method: options.method || 'GET' });
+  const headers = {};
+  if (!(options.body instanceof FormData)) {
+    headers['Content-Type'] = 'application/json';
+  }
+
+  const res = await fetch(path, {
+    headers,
+    body: options.body instanceof FormData ? options.body : options.body ? JSON.stringify(options.body) : undefined,
+    method: options.method || 'GET'
+  });
+
   if (!res.ok) {
     const error = await res.text();
     throw new Error(error || 'Request failed');
@@ -18,6 +28,7 @@ export const pingMeta = () => request(`${BASE}/meta/ping`, { method: 'POST' });
 export const syncTemplates = () => request(`${BASE}/meta/templates/sync`, { method: 'POST' });
 export const getTemplates = () => request(`${BASE}/templates`);
 export const getContacts = () => request(`${BASE}/contacts`);
+export const geminiGenerate = (body) => request(`${BASE}/gemini`, { method: 'POST', body });
 export const getAppointments = () => request(`${BASE}/appointments`);
 export const createAppointment = (body) => request(`${BASE}/appointments`, { method: 'POST', body });
 export const createCampaign = (body) => request(`${BASE}/campaigns`, { method: 'POST', body });
