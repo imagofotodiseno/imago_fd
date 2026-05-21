@@ -5,7 +5,10 @@
   "main": "server.js",
   "scripts": {
     "start": "node server.js",
-    "dev": "nodemon server.js"
+    "dev": "cd src-backend && npm run dev",
+    "backend": "cd src-backend && npm run dev",
+    "frontend": "cd src-frontend && npm run dev",
+    "setup": "bash setup.sh"
   },
   "dependencies": {
     "@google/genai": "^2.1.0",
