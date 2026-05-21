@@ -1,18 +1,16 @@
 {
-  "version": 2,
+  "version": 3,
   "builds": [
-    { "src": "api/*.js", "use": "@vercel/node" },
-    { "src": "index.html", "use": "@vercel/static" },
-    { "src": "style.css", "use": "@vercel/static" },
-    { "src": "public/**", "use": "@vercel/static" }
+    {
+      "src": "package.json",
+      "use": "@vercel/static-build",
+      "config": { "distDir": "src-frontend/dist" }
+    },
+    { "src": "api/index.js", "use": "@vercel/node" }
   ],
   "routes": [
-    { "src": "/api/chat/web", "dest": "api/chat.js" },
-    { "src": "/api/gemini",   "dest": "api/gemini.js" },
-    { "src": "/webhook",      "dest": "api/webhook.js" },
-    { "src": "/widget.js",    "dest": "public/widget.js" },
-    { "src": "/widget.css",   "dest": "public/widget.css" },
-    { "src": "/style.css",    "dest": "style.css" },
-    { "src": "/(.*)",         "dest": "index.html" }
+    { "src": "/api/(.*)", "dest": "/api/index.js" },
+    { "src": "/webhook", "dest": "/api/index.js" },
+    { "src": "/(.*)", "dest": "/index.html" }
   ]
 }

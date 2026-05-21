@@ -30,10 +30,12 @@ app.use('/api/appointments', require('./routes/appointments'));
 app.use('/webhook', require('./routes/webhook'));
 
 const PORT = process.env.PORT || 3001;
-app.listen(PORT, () => {
-  console.log(`Backend listening on port ${PORT}`);
-  startQueueProcessor();
-  scheduleReminders();
-});
+if (require.main === module) {
+  app.listen(PORT, () => {
+    console.log(`Backend listening on port ${PORT}`);
+    startQueueProcessor();
+    scheduleReminders();
+  });
+}
 
 module.exports = app;
