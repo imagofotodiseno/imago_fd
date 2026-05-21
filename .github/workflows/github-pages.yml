@@ -1,0 +1,50 @@
+name: Build and deploy GitHub Pages
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  build-and-deploy:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: true
+          fetch-depth: 0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v5
+        with:
+          node-version: '20'
+
+      - name: Install frontend dependencies
+        run: |
+          cd src-frontend
+          npm install
+
+      - name: Build frontend
+        run: |
+          cd src-frontend
+          npm run build
+
+      - name: Copy frontend build to docs
+        run: |
+          rm -rf docs
+          mkdir docs
+          cp -R src-frontend/dist/* docs/
+
+      - name: Commit docs build
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add docs
+          if ! git diff --cached --quiet; then
+            git commit -m "Build GitHub Pages from src-frontend"
+            git push origin main
+          else
+            echo "No changes in docs/"
+          fi
