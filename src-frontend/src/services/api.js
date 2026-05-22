@@ -19,6 +19,26 @@ const request = async (path, options = {}) => {
   return res.json();
 };
 
+// Generic API call function
+export const apiCall = async (method, path, body = null) => {
+  const headers = {};
+  if (!(body instanceof FormData) && body) {
+    headers['Content-Type'] = 'application/json';
+  }
+
+  const res = await fetch(path, {
+    headers,
+    body: body instanceof FormData ? body : body ? JSON.stringify(body) : undefined,
+    method
+  });
+
+  if (!res.ok) {
+    const error = await res.text();
+    throw new Error(error || 'Request failed');
+  }
+  return res.json();
+};
+
 export const uploadFile = (formData) => request(`${BASE}/import/upload`, { method: 'POST', body: formData });
 export const previewImport = (body) => request(`${BASE}/import/preview`, { method: 'POST', body });
 export const commitImport = (body) => request(`${BASE}/import/commit`, { method: 'POST', body });

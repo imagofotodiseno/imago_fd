@@ -66,7 +66,9 @@ CREATE TABLE IF NOT EXISTS messages (
   error_text TEXT,
   attempt_count INTEGER DEFAULT 0,
   last_attempt_at DATETIME,
-  created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+  created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+  FOREIGN KEY (campaign_id) REFERENCES campaigns(id),
+  FOREIGN KEY (contact_id) REFERENCES contacts(id)
 );
 
 CREATE TABLE IF NOT EXISTS appointments (
@@ -78,7 +80,8 @@ CREATE TABLE IF NOT EXISTS appointments (
   status TEXT DEFAULT 'scheduled',
   reminder_sent_at DATETIME,
   created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-  updated_at DATETIME
+  updated_at DATETIME,
+  FOREIGN KEY (contact_id) REFERENCES contacts(id)
 );
 
 CREATE TABLE IF NOT EXISTS webhook_events (
@@ -87,3 +90,11 @@ CREATE TABLE IF NOT EXISTS webhook_events (
   type TEXT,
   received_at DATETIME DEFAULT CURRENT_TIMESTAMP
 );
+
+-- Índices para optimización
+CREATE INDEX IF NOT EXISTS idx_contacts_phone ON contacts(phone);
+CREATE INDEX IF NOT EXISTS idx_messages_campaign ON messages(campaign_id);
+CREATE INDEX IF NOT EXISTS idx_messages_contact ON messages(contact_id);
+CREATE INDEX IF NOT EXISTS idx_messages_status ON messages(status);
+CREATE INDEX IF NOT EXISTS idx_appointments_contact ON appointments(contact_id);
+CREATE INDEX IF NOT EXISTS idx_webhook_events_type ON webhook_events(type);
