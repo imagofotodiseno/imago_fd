@@ -36,6 +36,7 @@ jobs:
           rm -rf docs
           mkdir docs
           cp -R src-frontend/dist/* docs/
+          printf '' > docs/.nojekyll
 
       - name: Commit docs build
         run: |
