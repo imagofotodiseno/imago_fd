@@ -31,21 +31,10 @@ jobs:
           cd src-frontend
           VITE_BASE=/imago_fd/ npm run build
 
-      - name: Copy frontend build to docs
-        run: |
-          rm -rf docs
-          mkdir docs
-          cp -R src-frontend/dist/* docs/
-          printf '' > docs/.nojekyll
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v1
+        with:
+          path: src-frontend/dist
 
-      - name: Commit docs build
-        run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add docs
-          if ! git diff --cached --quiet; then
-            git commit -m "Build GitHub Pages from src-frontend"
-            git push origin main
-          else
-            echo "No changes in docs/"
-          fi
+      - name: Deploy to GitHub Pages
+        uses: actions/deploy-pages@v1
