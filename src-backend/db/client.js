@@ -1,6 +1,5 @@
 const sqlite3 = require('sqlite3').verbose();
 const path = require('path');
-const { promisify } = require('util');
 
 const DB_FILE = path.join(__dirname, 'database.sqlite');
 
@@ -14,10 +13,30 @@ function openDatabase() {
         resolve({ lastID: this.lastID, changes: this.changes });
       });
     }),
-    get: promisify(db.get.bind(db)),
-    all: promisify(db.all.bind(db)),
-    exec: promisify(db.exec.bind(db)),
-    close: promisify(db.close.bind(db))
+    get: (sql, params = []) => new Promise((resolve, reject) => {
+      db.get(sql, params, (err, row) => {
+        if (err) return reject(err);
+        resolve(row);
+      });
+    }),
+    all: (sql, params = []) => new Promise((resolve, reject) => {
+      db.all(sql, params, (err, rows) => {
+        if (err) return reject(err);
+        resolve(rows);
+      });
+    }),
+    exec: (sql) => new Promise((resolve, reject) => {
+      db.exec(sql, (err) => {
+        if (err) return reject(err);
+        resolve();
+      });
+    }),
+    close: () => new Promise((resolve, reject) => {
+      db.close((err) => {
+        if (err) return reject(err);
+        resolve();
+      });
+    })
   };
 }
 

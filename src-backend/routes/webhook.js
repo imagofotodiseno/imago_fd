@@ -3,7 +3,7 @@ const router = express.Router();
 const path = require('path');
 const sqlite3 = require('sqlite3').verbose();
 
-const VERIFY_TOKEN = process.env.WH_WEBHOOK_VERIFY_TOKEN || 'change_me';
+const VERIFY_TOKEN = process.env.META_VERIFY_TOKEN || 'change_me';
 const DB_FILE = path.join(__dirname, '..', 'db', 'database.sqlite');
 
 const normalizeResponseText = (text) => {
