@@ -5,7 +5,10 @@ const { GoogleGenAI } = require('@google/genai');
 const chatSessions = {};
 
 // Inicializa el cliente de Gemini si la API key existe
-const ai = process.env.GEMINI_API_KEY ? new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY }) : null;
+const getAiClient = () => {
+    const apiKey = process.env.GEMINI_API_KEY;
+    return apiKey ? new GoogleGenAI({ apiKey }) : null;
+};
 
 /**
  * Función principal que orquesta qué agente debe responder
@@ -26,6 +29,7 @@ async function handleIncomingMessage(senderId, text, channel) {
         // Por simplicidad en esta versión, enviaremos todo a un Agente Estratega Unificado.
         
         let responseText = "";
+        const ai = getAiClient();
 
         if (ai) {
             // Llamar a Gemini con el historial
@@ -100,7 +104,7 @@ async function sendMessage(to, text, channel) {
     }
 
     const token = process.env.META_ACCESS_TOKEN;
-    const phoneId = process.env.WHATSAPP_PHONE_ID;
+    const phoneId = process.env.META_PHONE_NUMBER_ID || process.env.WHATSAPP_PHONE_ID;
 
     if (!token || !phoneId) {
         console.log(`⚠️ Credenciales de Meta no configuradas. Simulando envío a ${to}:\n"${text}"`);

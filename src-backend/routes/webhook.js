@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const path = require('path');
 const sqlite3 = require('sqlite3').verbose();
+const { handleIncomingMessage } = require('../../agents/orchestrator');
 
 const VERIFY_TOKEN = process.env.META_VERIFY_TOKEN || 'change_me';
 const DB_FILE = path.join(__dirname, '..', 'db', 'database.sqlite');
@@ -38,10 +39,15 @@ router.post('/', (req, res) => {
       const changes = entry.changes || [];
       changes.forEach((change) => {
         const value = change.value || {};
-        const messages = value.messages || [];
+        const messages = change.value.messages || [];
         messages.forEach((message) => {
           const from = message.from;
           const text = message.text?.body || message.button?.text || message.interactive?.button_reply?.title || message.interactive?.list_reply?.title;
+          
+          if (text && !message.status) {
+            handleIncomingMessage(from, text, 'whatsapp').catch(err => console.error('Error in agent webhook handler:', err));
+          }
+
           const normalized = normalizeResponseText(text);
           const confirmationKeywords = ['SI', 'SÍ', 'CONFIRMAR', 'ACEPTAR'];
           if (confirmationKeywords.includes(normalized)) {

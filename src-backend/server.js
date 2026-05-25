@@ -13,6 +13,9 @@ app.use(cors());
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
+// Servir archivos estáticos (Widget de Chat)
+app.use(express.static(path.join(__dirname, '..', 'public')));
+
 const dbDir = path.join(__dirname, 'db');
 if (!fs.existsSync(dbDir)) fs.mkdirSync(dbDir, { recursive: true });
 
@@ -27,6 +30,8 @@ app.use('/api/templates', require('./routes/templates'));
 app.use('/api/contacts', require('./routes/contacts'));
 app.use('/api/campaigns', require('./routes/campaigns'));
 app.use('/api/appointments', require('./routes/appointments'));
+app.use('/api/gemini', require('./routes/gemini'));
+app.use('/api/chat', require('./routes/chat'));
 app.use('/webhook', require('./routes/webhook'));
 
 const PORT = process.env.PORT || 3001;
