@@ -21,3 +21,14 @@ button {
 button {
   cursor: pointer;
 }
+
+@keyframes flowLine {
+  to {
+    stroke-dashoffset: -20;
+  }
+}
+
+.animate-flow-line {
+  animation: flowLine 1.2s linear infinite;
+}
+
