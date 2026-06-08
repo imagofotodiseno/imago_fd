@@ -43,3 +43,16 @@ async def obtener_status_ia(task_id: str):
     if not estado:
         raise HTTPException(status_code=404, detail="Tarea no encontrada")
     return estado
+    import sys
+
+def realizar_investigacion(query):
+    # ... Tu lógica actual de raspado y llamada a Gemini ...
+    resultado = f"Resultado del análisis estratégico para: {query}"
+    return resultado
+
+if __name__ == "__main__":
+    # Captura el argumento enviado por Node.js
+    if len(sys.argv) > 1:
+        query_usuario = sys.argv[1]
+        respuesta = realizar_investigacion(query_usuario)
+        print(respuesta) # Node.js leerá este print como el resultado final
