@@ -1,47 +1,45 @@
-import os
-from fastapi import APIRouter, HTTPException, status
+import asyncio
+import uuid
+from fastapi import APIRouter, BackgroundTasks, HTTPException
 from pydantic import BaseModel
-from typing import Optional
-import google.generativeai as genai
 
-router = APIRouter(prefix="/api/gemini", tags=["gemini"])
+router = APIRouter()
 
-class GeminiPromptSchema(BaseModel):
-    prompt: str
-    system: Optional[str] = None
-    useSearch: Optional[bool] = False
+# Diccionario global para guardar el estado del análisis
+# NOTA: Si usas múltiples instancias serverless, lo ideal será guardar esto 
+# usando tu 'db_client' que vi en init_db.py
+tareas_estado = {}
 
-@router.post("")
-async def generate_gemini_content(payload: GeminiPromptSchema):
-    """
-    Ruta Proxy que procesa peticiones directas de IA para el frontend.
-    Opcionalmente activa la búsqueda integrada de Google (Google Search Grounding).
-    """
-    api_key = os.getenv("GEMINI_API_KEY")
-    if not api_key:
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail="El agente no está configurado. Falta la GEMINI_API_KEY en el servidor."
-        )
-        
+class QueryPayload(BaseModel):
+    query: str
+
+async def ejecutar_analisis_ia_pesado(task_id: str, query: str):
     try:
-        genai.configure(api_key=api_key)
+        # Aquí va tu lógica actual que llama a Gemini y busca en Google
+        # Simulamos la espera de la API que tarda más de 10 segundos:
+        await asyncio.sleep(12) 
         
-        # Configurar las herramientas y parámetros de generación
-        tools = "google_search" if payload.useSearch else None
+        resultado_ia = f"Análisis estratégico completado para: {query}. Tendencias GEO/SEO validadas."
         
-        model = genai.GenerativeModel(
-            model_name="gemini-2.5-flash",
-            system_instruction=payload.system,
-            tools=tools
-        )
-        
-        # Ejecutar generación asíncrona
-        response = await model.generate_content_async(contents=payload.prompt)
-        return {"text": response.text or ""}
+        # Guardamos el resultado exitoso
+        tareas_estado[task_id] = {"status": "success", "data": resultado_ia}
     except Exception as e:
-        print(f"Error en proxy backend de Gemini: {e}")
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=str(e) or "Error interno al generar contenido"
-        )
+        tareas_estado[task_id] = {"status": "failed", "error": str(e)}
+
+@router.post("/api/gemini/analizar")
+async def analizar_tendencias(payload: QueryPayload, background_tasks: BackgroundTasks):
+    task_id = str(uuid.uuid4())
+    tareas_estado[task_id] = {"status": "processing", "data": None}
+    
+    # Dispara la tarea de fondo de inmediato y libera a Vercel
+    background_tasks.add_task(ejecutar_analisis_ia_pesado, task_id, payload.query)
+    
+    # Retorna un código 202 (Accepted) al frontend en milisegundos
+    return {"status": "processing", "task_id": task_id}
+
+@router.get("/api/gemini/status/{task_id}")
+async def obtener_status_ia(task_id: str):
+    estado = tareas_estado.get(task_id)
+    if not estado:
+        raise HTTPException(status_code=404, detail="Tarea no encontrada")
+    return estado

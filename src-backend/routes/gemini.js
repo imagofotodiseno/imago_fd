@@ -1,41 +1,36 @@
-const express = require('express');
-const router = express.Router();
-const { GoogleGenAI } = require('@google/genai');
+// Ejemplo de la función en tu botón del frontend
+const handleAnalizarTendencias = async (miQuery) => {
+  setLoading(true);
+  setError(null);
 
-router.post('/', async (req, res) => {
   try {
-    const { prompt, system, useSearch } = req.body;
-    if (!prompt) {
-      return res.status(400).json({ error: 'Falta el prompt' });
-    }
-
-    const apiKey = process.env.GEMINI_API_KEY;
-    if (!apiKey) {
-      return res.status(500).json({ error: 'El agente no está configurado. Falta la GEMINI_API_KEY en el servidor.' });
-    }
-
-    const ai = new GoogleGenAI({ apiKey });
-    const config = {};
-    
-    if (system) {
-      config.systemInstruction = system;
-    }
-    
-    if (useSearch) {
-      config.tools = [{ googleSearch: {} }];
-    }
-
-    const response = await ai.models.generateContent({
-      model: 'gemini-2.5-flash',
-      contents: prompt,
-      config: config
+    // 1. Iniciar la tarea de manera asíncrona
+    const response = await fetch('/api/gemini/analizar', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ query: miQuery })
     });
 
-    res.json({ text: response.text });
-  } catch (err) {
-    console.error('Error in /api/gemini backend route:', err);
-    res.status(500).json({ error: err.message || 'Error interno al generar contenido' });
-  }
-});
+    const { task_id } = await response.json();
 
-module.exports = router;
+    // 2. Crear un intervalo que verifique el estado cada 2 segundos
+    const checkStatusInterval = setInterval(async () => {
+      const resStatus = await fetch(`/api/gemini/status/${task_id}`);
+      const tarea = await resStatus.json();
+
+      if (tarea.status === 'success') {
+        clearInterval(checkStatusInterval);
+        setResultado(tarea.data); // Pintar los datos en la caja de texto
+        setLoading(false);
+      } else if (tarea.status === 'failed') {
+        clearInterval(checkStatusInterval);
+        setError('El análisis falló en el servidor.');
+        setLoading(false);
+      }
+    }, 2000);
+
+  } catch (err) {
+    setError('Error de conexión inicial.');
+    setLoading(false);
+  }
+};
