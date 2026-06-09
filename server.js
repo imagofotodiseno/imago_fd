@@ -21,7 +21,7 @@ const { handleIncomingMessage } = require('./agents/orchestrator');
 app.post('/api/chat/web', async (req, res) => {
     const { senderId, message } = req.body;
     if (!senderId || !message) return res.status(400).json({ error: 'Faltan datos' });
-    
+
     // Llamar al orquestador (canal 'web' devolverá el texto en lugar de enviar a Meta)
     const reply = await handleIncomingMessage(senderId, message, 'web');
     res.json({ reply });
@@ -31,13 +31,18 @@ app.post('/api/chat/web', async (req, res) => {
 const { GoogleGenAI } = require('@google/genai');
 app.post('/api/gemini', async (req, res) => {
     try {
-        const { prompt, system, useSearch } = req.body;
+        // Recibimos la apiKey del request body
+        const { prompt, system, useSearch, apiKey } = req.body;
         if (!prompt) return res.status(400).json({ error: 'Falta prompt' });
 
-        const apiKey = process.env.GEMINI_API_KEY;
-        if (!apiKey) return res.status(500).json({ error: 'Falta GEMINI_API_KEY en variables de entorno locales' });
+        // Priorizamos la Key del cliente (frontend), si no, usamos la del servidor (.env)
+        const activeApiKey = apiKey || process.env.GEMINI_API_KEY;
 
-        const ai = new GoogleGenAI({ apiKey });
+        if (!activeApiKey) {
+            return res.status(500).json({ error: 'Falta GEMINI_API_KEY. Configúrala en el panel o en el archivo .env.' });
+        }
+
+        const ai = new GoogleGenAI({ apiKey: activeApiKey });
         const config = {};
         if (system) config.systemInstruction = system;
         if (useSearch) config.tools = [{ googleSearch: {} }];
