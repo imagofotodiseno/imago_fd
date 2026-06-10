@@ -12,6 +12,18 @@ app.use(express.json());
 
 // Servir archivos estáticos (el widget)
 app.use(express.static('public'));
+const path = require('path');
+
+// Servir archivos estáticos (el widget)
+app.use(express.static('public'));
+
+// NUEVO: Servir la raíz del proyecto para que index.html y style.css funcionen
+app.use(express.static(__dirname));
+
+// NUEVO: Ruta principal que entrega tu CRM cuando visitas http://localhost:3000
+app.get('/', (req, res) => {
+    res.sendFile(path.join(__dirname, 'index.html'));
+});
 
 // Rutas
 app.use('/webhook', webhookRoutes);
