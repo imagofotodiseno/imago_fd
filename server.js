@@ -78,7 +78,13 @@ app.get('/', (req, res) => {
 });
 
 // Iniciar servidor
-app.listen(PORT, () => {
-    console.log(`🚀 Servidor ejecutándose en el puerto ${PORT}`);
-    console.log(`📡 Esperando Webhooks de Meta...`);
-});
+// Iniciar servidor SOLO si no estamos en un entorno Serverless (Vercel)
+if (process.env.NODE_ENV !== 'production') {
+    app.listen(PORT, () => {
+        console.log(`🚀 Servidor ejecutándose en el puerto ${PORT}`);
+        console.log(`📡 Esperando Webhooks de Meta...`);
+    });
+}
+
+// ¡ESTA LÍNEA ES LA MAGIA PARA VERCEL! Exportamos la app de Express
+module.exports = app;

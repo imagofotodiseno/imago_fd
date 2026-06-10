@@ -5,10 +5,8 @@
   "main": "server.js",
   "scripts": {
     "start": "node server.js",
-    "dev": "cd src-backend && npm run dev",
-    "backend": "cd src-backend && npm run dev",
-    "frontend": "cd src-frontend && npm run dev",
-    "build": "cd src-frontend && npm install && npm run build",
+    "dev": "node server.js",
+    "build": "echo 'No se requiere build, es HTML puro'",
     "setup": "bash setup.sh"
   },
   "dependencies": {
