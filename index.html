@@ -341,26 +341,32 @@
         }
 
         async function fetchGemini(prompt, system = "", useSearch = false) {
-            const url = "/api/gemini";
-            // Recuperamos la key del localStorage
+            // 1. Apuntamos directamente a la URL de tu backend local
+            const url = "http://localhost:3000/api/gemini";
             const currentApiKey = localStorage.getItem('imago_gemini_key') || "";
 
-            const response = await fetch(url, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                // Enviamos la apiKey en el body
-                body: JSON.stringify({ prompt, system, useSearch, apiKey: currentApiKey })
-            });
+            try {
+                const response = await fetch(url, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ prompt, system, useSearch, apiKey: currentApiKey })
+                });
 
-            const data = await response.json();
+                const data = await response.json();
 
-            if (!response.ok) {
-                console.error("API Error:", data);
-                throw new Error(data.error || `Error en la API (${response.status})`);
+                if (!response.ok) {
+                    throw new Error(data.error || `Error en la API (${response.status})`);
+                }
+
+                return data.text;
+            } catch (error) {
+                // 2. Si falla, mostramos el error en consola para no quedarnos "ciegos"
+                console.error("Fallo crítico en fetchGemini:", error);
+                throw error; // Lanzamos el error para que la interfaz apague el estado "Pensando..."
             }
-            return data.text;
+
         }
 
         const chatForm = document.getElementById('chatForm');
