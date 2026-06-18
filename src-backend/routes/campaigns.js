@@ -110,4 +110,19 @@ router.get('/:id/status', async (req, res) => {
 
     // Reducimos los datos para entregar exactamente el formato agrupado que el frontend requiere
     const counts = statusCounts.reduce((acc, current) => {
-      const existing = acc.find(item
+      const existing = acc.find(item => item.status === current.status);
+      if (existing) {
+        existing.count++;
+      } else {
+        acc.push({ status: current.status, count: 1 });
+      }
+      return acc;
+    }, []);
+
+    res.json({ status: counts });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+module.exports = router;
