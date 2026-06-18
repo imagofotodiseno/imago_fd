@@ -1,0 +1,26 @@
+{
+  "name": "imago-multichannel-agent",
+  "version": "1.0.0",
+  "description": "Backend para orquestación de agentes de Imago Fotodiseño con integración a Meta (WhatsApp, IG, FB)",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js",
+    "build": "echo 'No se requiere build, es HTML puro'",
+    "setup": "bash setup.sh"
+  },
+  "dependencies": {
+    "@google/genai": "^2.1.0",
+    "axios": "^1.6.8",
+    "body-parser": "^1.20.2",
+    "cors": "^2.8.5",
+    "date-fns": "^2.30.0",
+    "dotenv": "^16.4.5",
+    "exceljs": "^4.3.0",
+    "express": "^4.19.2",
+    "multer": "^1.4.5-lts.1",
+    "node-cron": "^3.0.2",
+    "serverless-http": "^3.0.0",
+    "sqlite3": "^5.1.6"
+  }
+}

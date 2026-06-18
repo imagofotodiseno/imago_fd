@@ -1,0 +1,40 @@
+name: Build and deploy GitHub Pages
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  build-and-deploy:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: true
+          fetch-depth: 0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v5
+        with:
+          node-version: '20'
+
+      - name: Install frontend dependencies
+        run: |
+          cd src-frontend
+          npm install
+
+      - name: Build frontend
+        run: |
+          cd src-frontend
+          VITE_BASE=/imago_fd/ npm run build
+
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v1
+        with:
+          path: src-frontend/dist
+
+      - name: Deploy to GitHub Pages
+        uses: actions/deploy-pages@v1

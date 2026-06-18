@@ -1,0 +1,751 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Imago Social Media Agent | Command Center</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body class="h-screen flex">
+
+    <aside class="w-64 border-r border-slate-800 flex flex-col bg-[#020617] z-20">
+        <div class="p-6 border-b border-slate-800">
+            <div class="flex items-center gap-3">
+                <div
+                    class="w-10 h-10 bg-gradient-to-tr from-blue-600 to-violet-600 rounded-xl flex items-center justify-center">
+                    <i class="fas fa-rocket text-white"></i>
+                </div>
+                <div>
+                    <h1 class="font-bold text-lg leading-none">IMAGO</h1>
+                    <span class="text-[10px] text-blue-400 font-bold tracking-widest uppercase">Social Agent</span>
+                </div>
+            </div>
+        </div>
+        cd "/e/03 IMAGO/CRM IMAGO/imago_fd"
+        <nav class="flex-grow p-4 space-y-2 mt-4">
+            <button onclick="showView('dashboard')"
+                class="nav-btn sidebar-item active w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all">
+                <i class="fas fa-chart-pie w-5"></i> Panel Estratégico
+            </button>
+            <button onclick="showView('chat')"
+                class="nav-btn sidebar-item w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all">
+                <i class="fas fa-robot w-5"></i> Chatbot Experto
+            </button>
+            <button onclick="showView('ads')"
+                class="nav-btn sidebar-item w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all">
+                <i class="fas fa-bullhorn w-5"></i> Meta Ads Copywriter
+            </button>
+            <button onclick="showView('inbox')"
+                class="nav-btn sidebar-item w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all">
+                <i class="fas fa-inbox w-5"></i> Inbox
+                <span id="inbox-badge"
+                    class="ml-auto bg-blue-500 text-white text-[10px] font-bold px-2 py-0.5 rounded-full hidden">0</span>
+            </button>
+            <button onclick="showView('crm')"
+                class="nav-btn sidebar-item w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all">
+                <i class="fas fa-columns w-5"></i> CRM Kanban
+            </button>
+            <button onclick="setupApiKey()"
+                class="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium text-amber-400 hover:bg-amber-400/10 transition-all mt-auto">
+                <i class="fas fa-key w-5"></i> Configurar API Key
+            </button>
+        </nav>
+    </aside>
+
+    <main class="flex-grow relative overflow-hidden flex flex-col bg-slate-950">
+        <header class="h-16 border-b border-slate-800 flex items-center justify-between px-8 bg-slate-900/20">
+            <div id="viewTitle" class="text-sm font-semibold text-slate-300 uppercase tracking-widest">Dashboard</div>
+        </header>
+
+        <div id="views" class="flex-grow overflow-y-auto p-8">
+            <!-- Dashboard -->
+            <div id="view-dashboard" class="content-view space-y-8">
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div
+                        class="glass-card p-6 rounded-3xl border-l-4 border-l-blue-500 flex flex-col hover:scale-[1.02] transition-transform">
+                        <div class="bg-blue-500/20 w-10 h-10 rounded-xl flex items-center justify-center mb-4"><i
+                                class="fas fa-search text-blue-400"></i></div>
+                        <h3 class="font-bold">Investigación</h3>
+                        <p class="text-xs text-slate-400 mb-4">Busca tendencias y pasos a seguir.</p>
+                        <input type="text" id="researchInput" placeholder="Ej. Restaurantes en Colombia"
+                            class="w-full bg-slate-900 border border-slate-800 p-3 rounded-xl text-xs mb-4 outline-none focus:border-blue-500 text-slate-200">
+                        <button onclick="runMarketResearch()"
+                            class="bg-blue-600 hover:bg-blue-500 py-3 rounded-xl text-xs font-bold w-full transition-colors mt-auto">Analizar
+                            Tendencias</button>
+                    </div>
+                    <div
+                        class="glass-card p-6 rounded-3xl border-l-4 border-l-purple-500 flex flex-col hover:scale-[1.02] transition-transform">
+                        <div class="bg-purple-500/20 w-10 h-10 rounded-xl flex items-center justify-center mb-4"><i
+                                class="fas fa-users text-purple-400"></i></div>
+                        <h3 class="font-bold">Públicos Meta</h3>
+                        <p class="text-xs text-slate-400 mb-4">Define perfiles y cómo atacarlos.</p>
+                        <input type="text" id="audienceInput" placeholder="Ej. Menú digital para bares"
+                            class="w-full bg-slate-900 border border-slate-800 p-3 rounded-xl text-xs mb-4 outline-none focus:border-purple-500 text-slate-200">
+                        <button onclick="generateAudience()"
+                            class="bg-purple-600 hover:bg-purple-500 py-3 rounded-xl text-xs font-bold w-full transition-colors mt-auto">Definir
+                            Público</button>
+                    </div>
+                    <div
+                        class="glass-card p-6 rounded-3xl border-l-4 border-l-pink-500 flex flex-col hover:scale-[1.02] transition-transform">
+                        <div class="bg-pink-500/20 w-10 h-10 rounded-xl flex items-center justify-center mb-4"><i
+                                class="fas fa-layer-group text-pink-400"></i></div>
+                        <h3 class="font-bold">Estrategia</h3>
+                        <p class="text-xs text-slate-400 mb-4">Crea pilares y ruta de acción.</p>
+                        <input type="text" id="strategyInput" placeholder="Ej. Lanzamiento marca de ropa"
+                            class="w-full bg-slate-900 border border-slate-800 p-3 rounded-xl text-xs mb-4 outline-none focus:border-pink-500 text-slate-200">
+                        <button onclick="generateContentStrategy()"
+                            class="bg-pink-600 hover:bg-pink-500 py-3 rounded-xl text-xs font-bold w-full transition-colors mt-auto">Generar
+                            Estrategia</button>
+                    </div>
+                </div>
+                <div id="dashboardResult"
+                    class="hidden p-6 glass-card rounded-3xl text-sm text-slate-300 border border-slate-800 whitespace-pre-wrap leading-relaxed shadow-xl">
+                </div>
+            </div>
+
+            <!-- Chat -->
+            <div id="view-chat" class="content-view hidden flex flex-col h-full max-w-4xl mx-auto">
+                <div id="chatMessages" class="flex-grow space-y-4 overflow-y-auto pb-4">
+                    <div class="flex gap-3">
+                        <div class="w-8 h-8 rounded-lg bg-blue-600 flex items-center justify-center shrink-0"><i
+                                class="fas fa-robot text-xs"></i></div>
+                        <div
+                            class="bg-slate-900 border border-slate-800 p-4 rounded-2xl rounded-tl-none text-sm max-w-[85%]">
+                            ¡Hola! Soy tu Agente Imago. ¿En qué proyecto de marketing trabajamos hoy?
+                        </div>
+                    </div>
+                </div>
+                <form id="chatForm"
+                    class="p-4 bg-slate-900 border border-slate-800 rounded-3xl mt-4 flex items-center gap-3">
+                    <input type="text" id="chatInput" placeholder="Escribe tu estrategia..."
+                        class="flex-grow bg-transparent border-none outline-none text-sm">
+                    <button type="submit" class="w-10 h-10 bg-blue-600 rounded-xl flex items-center justify-center"><i
+                            class="fas fa-paper-plane"></i></button>
+                </form>
+            </div>
+
+            <!-- Ads -->
+            <div id="view-ads" class="content-view hidden max-w-5xl mx-auto w-full">
+                <div class="glass p-8 rounded-[2rem] space-y-6">
+                    <div>
+                        <h2
+                            class="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-purple-500">
+                            Generador de Meta Ads</h2>
+                        <p class="text-slate-400 text-sm mt-2">Crea copys persuasivos optimizados para conversión en
+                            Facebook e Instagram.</p>
+                    </div>
+                    <div class="grid grid-cols-1 lg:grid-cols-5 gap-8">
+                        <div class="space-y-4 lg:col-span-2">
+                            <div>
+                                <label
+                                    class="text-xs font-bold text-slate-400 mb-1 block uppercase tracking-wider">Producto
+                                    o Servicio</label>
+                                <input type="text" id="adService" placeholder="Ej. Sesión de fotos gastronómica"
+                                    class="w-full bg-slate-900 border border-slate-800 focus:border-blue-500 outline-none p-4 rounded-2xl text-sm transition-colors">
+                            </div>
+                            <div>
+                                <label
+                                    class="text-xs font-bold text-slate-400 mb-1 block uppercase tracking-wider">Público
+                                    Objetivo</label>
+                                <input type="text" id="adAudience" placeholder="Ej. Restaurantes en Medellín"
+                                    class="w-full bg-slate-900 border border-slate-800 focus:border-purple-500 outline-none p-4 rounded-2xl text-sm transition-colors">
+                            </div>
+                            <button onclick="generateAdCopy()"
+                                class="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-500 hover:to-purple-500 py-4 rounded-2xl font-bold shadow-lg shadow-blue-900/20 transition-all hover:scale-[1.02]">
+                                <i class="fas fa-magic mr-2"></i> Generar Anuncio y Visual
+                            </button>
+                        </div>
+                        <div id="adResult"
+                            class="bg-slate-950 border border-slate-800 rounded-3xl p-6 text-sm text-slate-300 lg:col-span-3 overflow-y-auto max-h-[500px] leading-relaxed relative min-h-[200px]">
+                            <div
+                                class="absolute inset-0 flex items-center justify-center text-slate-600 p-6 text-center">
+                                Completa los datos y presiona generar para crear tu anuncio AIDA y su diseño visual...
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ══ INBOX ═══════════════════════════════════════════════════ -->
+            <div id="view-inbox" class="content-view hidden flex gap-0 h-full -m-8">
+
+                <!-- Lista de conversaciones -->
+                <div class="w-80 border-r border-slate-800 flex flex-col bg-slate-900/30">
+                    <div class="p-4 border-b border-slate-800">
+                        <div class="relative">
+                            <i class="fas fa-search absolute left-3 top-3 text-slate-500 text-xs"></i>
+                            <input id="inbox-search" type="text" placeholder="Buscar conversación..."
+                                oninput="filterConversations(this.value)"
+                                class="w-full bg-slate-900 border border-slate-800 pl-8 pr-4 py-2.5 rounded-xl text-xs outline-none focus:border-blue-500 text-slate-300">
+                        </div>
+                    </div>
+                    <div id="conversation-list" class="flex-grow overflow-y-auto"></div>
+                </div>
+
+                <!-- Panel de chat activo -->
+                <div class="flex-grow flex flex-col">
+                    <div id="inbox-empty" class="flex-grow flex flex-col items-center justify-center text-slate-600">
+                        <i class="fas fa-comments text-5xl mb-4"></i>
+                        <p class="text-sm">Selecciona una conversación</p>
+                    </div>
+                    <div id="inbox-chat" class="hidden flex-grow flex flex-col">
+                        <div class="p-4 border-b border-slate-800 flex items-center gap-3 bg-slate-900/20">
+                            <div id="inbox-avatar"
+                                class="w-9 h-9 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center font-bold text-sm">
+                            </div>
+                            <div>
+                                <div id="inbox-name" class="font-semibold text-sm"></div>
+                                <div id="inbox-channel" class="text-[10px] text-slate-500"></div>
+                            </div>
+                            <div class="ml-auto flex gap-2">
+                                <button onclick="moveToKanban(currentConversation, 'progress')"
+                                    title="Mover a En Progreso"
+                                    class="px-3 py-1.5 bg-amber-500/20 text-amber-400 rounded-lg text-xs hover:bg-amber-500/30 transition-colors">
+                                    <i class="fas fa-arrow-right mr-1"></i>En Progreso
+                                </button>
+                                <button onclick="moveToKanban(currentConversation, 'closed')" title="Cerrar lead"
+                                    class="px-3 py-1.5 bg-green-500/20 text-green-400 rounded-lg text-xs hover:bg-green-500/30 transition-colors">
+                                    <i class="fas fa-check mr-1"></i>Cerrado
+                                </button>
+                            </div>
+                        </div>
+                        <div id="inbox-messages" class="flex-grow overflow-y-auto p-4 space-y-3"></div>
+                        <div class="p-4 border-t border-slate-800 flex gap-3">
+                            <input id="inbox-reply" type="text" placeholder="Responder manualmente..."
+                                onkeypress="if(event.key==='Enter') sendInboxReply()"
+                                class="flex-grow bg-slate-900 border border-slate-800 px-4 py-2.5 rounded-xl text-sm outline-none focus:border-blue-500 text-slate-200">
+                            <button onclick="sendInboxReply()"
+                                class="w-10 h-10 bg-blue-600 hover:bg-blue-500 rounded-xl flex items-center justify-center transition-colors">
+                                <i class="fas fa-paper-plane text-sm"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ══ CRM KANBAN ═════════════════════════════════════════════ -->
+            <div id="view-crm" class="content-view hidden">
+                <div class="flex items-center justify-between mb-6">
+                    <div>
+                        <h2 class="text-xl font-bold">Pipeline de Leads</h2>
+                        <p class="text-slate-400 text-xs mt-1">Arrastra las tarjetas entre columnas para gestionar el
+                            avance</p>
+                    </div>
+                    <button onclick="showAddLeadModal()"
+                        class="bg-blue-600 hover:bg-blue-500 px-4 py-2 rounded-xl text-sm font-semibold transition-colors">
+                        <i class="fas fa-plus mr-2"></i>Nuevo Lead
+                    </button>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <!-- Columna: Nuevo Lead -->
+                    <div class="kanban-col flex flex-col" id="col-new" ondragover="event.preventDefault()"
+                        ondrop="dropCard(event,'new')">
+                        <div class="flex items-center gap-2 mb-4">
+                            <div class="w-2.5 h-2.5 rounded-full bg-blue-400"></div>
+                            <span class="text-sm font-bold text-slate-300">Nuevo Lead</span>
+                            <span id="count-new"
+                                class="ml-auto text-xs bg-blue-500/20 text-blue-400 px-2 py-0.5 rounded-full">0</span>
+                        </div>
+                        <div id="cards-new"
+                            class="flex flex-col gap-3 flex-grow min-h-[120px] rounded-2xl p-2 transition-colors"></div>
+                    </div>
+                    <!-- Columna: En Progreso -->
+                    <div class="kanban-col flex flex-col" id="col-progress" ondragover="event.preventDefault()"
+                        ondrop="dropCard(event,'progress')">
+                        <div class="flex items-center gap-2 mb-4">
+                            <div class="w-2.5 h-2.5 rounded-full bg-amber-400"></div>
+                            <span class="text-sm font-bold text-slate-300">En Progreso</span>
+                            <span id="count-progress"
+                                class="ml-auto text-xs bg-amber-500/20 text-amber-400 px-2 py-0.5 rounded-full">0</span>
+                        </div>
+                        <div id="cards-progress"
+                            class="flex flex-col gap-3 flex-grow min-h-[120px] rounded-2xl p-2 transition-colors"></div>
+                    </div>
+                    <!-- Columna: Cerrado -->
+                    <div class="kanban-col flex flex-col" id="col-closed" ondragover="event.preventDefault()"
+                        ondrop="dropCard(event,'closed')">
+                        <div class="flex items-center gap-2 mb-4">
+                            <div class="w-2.5 h-2.5 rounded-full bg-green-400"></div>
+                            <span class="text-sm font-bold text-slate-300">Cerrado</span>
+                            <span id="count-closed"
+                                class="ml-auto text-xs bg-green-500/20 text-green-400 px-2 py-0.5 rounded-full">0</span>
+                        </div>
+                        <div id="cards-closed"
+                            class="flex flex-col gap-3 flex-grow min-h-[120px] rounded-2xl p-2 transition-colors"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Modal: Nuevo Lead -->
+            <div id="lead-modal"
+                class="hidden fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center">
+                <div class="bg-slate-900 border border-slate-700 rounded-3xl p-8 w-full max-w-md shadow-2xl">
+                    <h3 class="font-bold text-lg mb-6">Agregar Nuevo Lead</h3>
+                    <div class="space-y-4">
+                        <input id="lead-name" type="text" placeholder="Nombre completo *"
+                            class="w-full bg-slate-800 border border-slate-700 focus:border-blue-500 outline-none px-4 py-3 rounded-xl text-sm">
+                        <input id="lead-email" type="email" placeholder="Email"
+                            class="w-full bg-slate-800 border border-slate-700 focus:border-blue-500 outline-none px-4 py-3 rounded-xl text-sm">
+                        <input id="lead-phone" type="tel" placeholder="Teléfono / WhatsApp"
+                            class="w-full bg-slate-800 border border-slate-700 focus:border-blue-500 outline-none px-4 py-3 rounded-xl text-sm">
+                        <select id="lead-service"
+                            class="w-full bg-slate-800 border border-slate-700 focus:border-blue-500 outline-none px-4 py-3 rounded-xl text-sm text-slate-300">
+                            <option value="">Servicio de interés...</option>
+                            <option>Fotografía de Producto</option>
+                            <option>Branding / Identidad Visual</option>
+                            <option>Gestión de Redes Sociales</option>
+                            <option>Pauta Digital (Meta Ads)</option>
+                            <option>Diseño Gráfico</option>
+                            <option>Otro</option>
+                        </select>
+                        <textarea id="lead-notes" placeholder="Notas adicionales..." rows="3"
+                            class="w-full bg-slate-800 border border-slate-700 focus:border-blue-500 outline-none px-4 py-3 rounded-xl text-sm resize-none"></textarea>
+                    </div>
+                    <div class="flex gap-3 mt-6">
+                        <button onclick="closeLeadModal()"
+                            class="flex-1 py-3 rounded-xl text-sm border border-slate-700 hover:bg-slate-800 transition-colors">Cancelar</button>
+                        <button onclick="saveLead()"
+                            class="flex-1 py-3 rounded-xl text-sm bg-blue-600 hover:bg-blue-500 font-semibold transition-colors">Guardar
+                            Lead</button>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <script>
+        let apiKey = localStorage.getItem('imago_gemini_key') || "";
+
+        function setupApiKey() {
+            const key = prompt("Pega tu API Key de Gemini aquí (Se guardará localmente en tu navegador):", apiKey);
+            if (key) {
+                apiKey = key;
+                localStorage.setItem('imago_gemini_key', key);
+                alert("API Key guardada correctamente.");
+            }
+        }
+
+        function showView(viewId) {
+            document.querySelectorAll('.content-view').forEach(v => v.classList.add('hidden'));
+            document.getElementById(`view-${viewId}`).classList.remove('hidden');
+            document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.remove('active'));
+            event.currentTarget.classList.add('active');
+            document.getElementById('viewTitle').innerText = viewId.toUpperCase();
+        }
+
+        async function fetchGemini(prompt, system = "", useSearch = false) {
+            // 1. Apuntamos directamente a la URL de tu backend local
+            const url = "http://localhost:3000/api/gemini";
+            const currentApiKey = localStorage.getItem('imago_gemini_key') || "";
+
+            try {
+                const response = await fetch(url, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ prompt, system, useSearch, apiKey: currentApiKey })
+                });
+
+                const data = await response.json();
+
+                if (!response.ok) {
+                    throw new Error(data.error || `Error en la API (${response.status})`);
+                }
+
+                return data.text;
+            } catch (error) {
+                // 2. Si falla, mostramos el error en consola para no quedarnos "ciegos"
+                console.error("Fallo crítico en fetchGemini:", error);
+                throw error; // Lanzamos el error para que la interfaz apague el estado "Pensando..."
+            }
+
+        }
+
+        const chatForm = document.getElementById('chatForm');
+        chatForm.onsubmit = async (e) => {
+            e.preventDefault();
+            const input = document.getElementById('chatInput');
+            const text = input.value.trim();
+            if (!text) return;
+
+            addChatMessage(text, true);
+            input.value = '';
+
+            try {
+                const response = await fetchGemini(text, `Eres el estratega senior de Imago Fotodiseño, una agencia y taller creativo líder en Medellín, Colombia, y parte del Distrito Gráfico de Medellín.
+Ofreces servicios profesionales de:
+1. Diseño Gráfico (branding, identidad de marca).
+2. Diseño Editorial (catálogos, revistas, material corporativo).
+3. Diseño Web moderno y optimizado para Google (SEO).
+4. Fotografía Profesional de alta calidad (producto, publicidad, e-commerce).
+5. Impresión Litográfica de alta gama (offset, digital, acabados troquelados, laminados y metalizados).
+6. Marquillas y Etiquetas (adhesivas, cartón y estampadas).
+
+Tu objetivo es responder de forma estratégica, creativa y muy comercial a las dudas del usuario. Tu respuesta debe estructurarse usando exactamente estos servicios de nuestro catálogo oficial y orientar al cliente a solicitar una cotización al WhatsApp +57 320 592 9106 o visitarnos en Calle 54 #54-55 Local 114, Medellín.`);
+                addChatMessage(response);
+            } catch (err) {
+                console.error("Chat error:", err);
+                addChatMessage(`Error: ${err.message || "Verifica tu API Key."}`);
+            }
+        };
+
+        function addChatMessage(content, isUser = false) {
+            const msg = document.createElement('div');
+            msg.className = `flex gap-3 ${isUser ? 'flex-row-reverse' : ''}`;
+            msg.innerHTML = `
+            <div class="w-8 h-8 rounded-lg ${isUser ? 'bg-slate-700' : 'bg-gradient-to-br from-blue-600 to-purple-600'} flex items-center justify-center shrink-0 shadow-lg">
+                <i class="fas fa-${isUser ? 'user' : 'robot'} text-xs text-white"></i>
+            </div>
+            <div class="${isUser ? 'bg-blue-600 text-white' : 'glass-card border border-slate-700 text-slate-200'} p-4 rounded-2xl text-sm max-w-[85%] whitespace-pre-wrap leading-relaxed shadow-sm">
+                ${content}
+            </div>`;
+            document.getElementById('chatMessages').appendChild(msg);
+            document.getElementById('chatMessages').scrollTop = document.getElementById('chatMessages').scrollHeight;
+        }
+
+        async function runMarketResearch() {
+            const topic = document.getElementById('researchInput').value.trim() || "marketing digital y diseño en Colombia";
+            const res = document.getElementById('dashboardResult');
+            res.classList.remove('hidden');
+            res.innerHTML = '<div class="flex items-center text-blue-400"><i class="fas fa-circle-notch fa-spin mr-3"></i> Analizando tendencias...</div>';
+            try {
+                const data = await fetchGemini(`Analiza las tendencias actuales sobre: "${topic}". Dame un resumen en bullet points de lo que funciona ahora y qué pasos exactos seguir para aprovechar estas tendencias.`, "Analista de Mercado", true);
+                res.innerText = data;
+            } catch (err) {
+                res.innerText = `Error: ${err.message}`;
+            }
+        }
+
+        async function generateAudience() {
+            const topic = document.getElementById('audienceInput').value.trim() || "fotografía de producto y diseño";
+            const res = document.getElementById('dashboardResult');
+            res.classList.remove('hidden');
+            res.innerHTML = '<div class="flex items-center text-purple-400"><i class="fas fa-circle-notch fa-spin mr-3"></i> Definiendo Buyer Personas...</div>';
+            try {
+                const data = await fetchGemini(`Define 2 perfiles de público objetivo (Buyer Personas) ideales para: "${topic}". Incluye: nombre, edad, intereses, dolores principales, y qué pasos estratégicos seguir para conectar con ellos y venderles.`, "Experto en Audiencias");
+                res.innerText = data;
+            } catch (err) {
+                res.innerText = `Error: ${err.message}`;
+            }
+        }
+
+        async function generateContentStrategy() {
+            const topic = document.getElementById('strategyInput').value.trim() || "la marca Imago Fotodiseño en Instagram y TikTok";
+            const res = document.getElementById('dashboardResult');
+            res.classList.remove('hidden');
+            res.innerHTML = '<div class="flex items-center text-pink-400"><i class="fas fa-circle-notch fa-spin mr-3"></i> Creando estrategia de contenido...</div>';
+            try {
+                const data = await fetchGemini(`Crea una estrategia de contenido accionable para: "${topic}". Define 3 pilares de contenido y detalla una lista de pasos a seguir para ejecutar esta estrategia con éxito esta semana.`, "Content Strategist");
+                res.innerText = data;
+            } catch (err) {
+                res.innerText = `Error: ${err.message}`;
+            }
+        }
+
+        async function generateAdCopy() {
+            const service = document.getElementById('adService').value;
+            const audience = document.getElementById('adAudience')?.value || 'público general';
+            const res = document.getElementById('adResult');
+            res.classList.remove('relative');
+            res.innerHTML = '<div class="flex flex-col items-center justify-center h-full text-blue-400 py-10"><i class="fas fa-circle-notch fa-spin mr-3 text-3xl mb-4"></i><p>Redactando copy y diseñando imagen visual...</p></div>';
+
+            try {
+                // 1. Generate Copy
+                const copyPromise = fetchGemini(`Crea un anuncio AIDA persuasivo para Meta Ads (Facebook/Instagram) sobre: "${service}". Dirigido a: "${audience}". Incluye: Emojis, un gancho (Hook) muy atractivo en la primera línea, descripción del valor/solución, y un Call to Action (CTA) claro.`, "Copywriter Experto en Meta Ads");
+
+                // 2. Generate Image Prompt
+                const imagePromptPromise = fetchGemini(`Create a highly detailed, photorealistic image prompt (in english) for an ad about: "${service}" targeted to "${audience}". The image should be commercial, high quality, and visually striking. Just return the english prompt, no other text or explanation.`, "Expert Midjourney Prompt Engineer");
+
+                const [copy, imagePrompt] = await Promise.all([copyPromise, imagePromptPromise]);
+
+                const encodedPrompt = encodeURIComponent(imagePrompt.trim());
+                // Pollinations returns a generated image based on the prompt
+                const imageUrl = `https://image.pollinations.ai/prompt/${encodedPrompt}?width=1080&height=1080&nologo=true`;
+
+                res.innerHTML = `
+                    <div class="flex flex-col lg:flex-row gap-6 h-full">
+                        <div class="flex-1 whitespace-pre-wrap text-slate-300 pr-2 border-b lg:border-b-0 lg:border-r border-slate-800 pb-4 lg:pb-0 lg:pr-6">${copy}</div>
+                        <div class="flex-1 flex flex-col items-center gap-4">
+                            <h4 class="font-bold text-slate-400 text-xs uppercase tracking-wider"><i class="fas fa-image mr-2"></i> Diseño Visual Generado</h4>
+                            <div class="relative w-full max-w-sm aspect-square bg-slate-900 rounded-2xl overflow-hidden shadow-xl border border-slate-700 flex items-center justify-center">
+                                <i class="fas fa-spinner fa-spin text-slate-600 text-3xl absolute"></i>
+                                <img src="${imageUrl}" class="w-full h-full object-cover relative z-10 transition-opacity duration-500 cursor-pointer hover:scale-105" alt="Generando anuncio visual..." onload="this.style.opacity=1" style="opacity:0;" onclick="window.open(this.src, '_blank')" title="Clic para ampliar" />
+                            </div>
+                            <p class="text-[10px] text-slate-500 text-center italic mt-2 px-2 hidden lg:block overflow-hidden max-h-16 text-ellipsis">"${imagePrompt}"</p>
+                        </div>
+                    </div>
+                `;
+            } catch (err) {
+                res.innerHTML = `<div class="text-red-400 p-4 bg-red-900/20 rounded-xl w-full text-center">Error: ${err.message}</div>`;
+            }
+        }
+    </script>
+
+    <!-- Imago Web Chat Widget Demo -->
+    <script src="/widget.js"></script>
+
+    <script>
+        /* ═══════════════════════════════════════════════════════════════════════
+           INBOX — Gestión de conversaciones entrantes
+           Almacena conversaciones en localStorage (sin BD requerida)
+        ═══════════════════════════════════════════════════════════════════════ */
+
+        let conversations = JSON.parse(localStorage.getItem('imago_conversations') || '[]');
+        let currentConversation = null;
+
+        // Seed de datos demo si no hay conversaciones
+        if (conversations.length === 0) {
+            conversations = [
+                {
+                    id: 'wa_573001234567', name: 'Ana Gómez', channel: 'WhatsApp', avatar: 'AG', status: 'new', unread: 2, messages: [
+                        { from: 'user', text: 'Hola! ¿Hacen sesiones de fotos para e-commerce?', time: '10:15' },
+                        { from: 'bot', text: '¡Hola Ana! Sí, somos especialistas en fotografía de producto 📸. ¿Cuántos productos necesitas fotografiar?', time: '10:15' },
+                        { from: 'user', text: 'Tengo como 50 productos para mi tienda de ropa', time: '10:17' },
+                    ]
+                },
+                {
+                    id: 'web_abc123', name: 'Carlos Ruiz', channel: 'Web Chat', avatar: 'CR', status: 'progress', unread: 0, messages: [
+                        { from: 'user', text: 'Necesito un logo para mi restaurante', time: 'Ayer' },
+                        { from: 'bot', text: '¡Con gusto! 🎨 ¿Tienes algún estilo o referencia en mente para el diseño?', time: 'Ayer' },
+                    ]
+                },
+                {
+                    id: 'ig_987654', name: 'María Torres', channel: 'Instagram', avatar: 'MT', status: 'new', unread: 1, messages: [
+                        { from: 'user', text: '¿Cuánto vale el paquete de redes sociales?', time: '09:30' },
+                    ]
+                },
+            ];
+            saveConversations();
+        }
+
+        function saveConversations() {
+            localStorage.setItem('imago_conversations', JSON.stringify(conversations));
+        }
+
+        function renderConversationList(filter = '') {
+            const list = document.getElementById('conversation-list');
+            const filtered = conversations.filter(c =>
+                c.name.toLowerCase().includes(filter.toLowerCase()) ||
+                c.channel.toLowerCase().includes(filter.toLowerCase())
+            );
+            list.innerHTML = filtered.length === 0
+                ? '<p class="text-center text-slate-600 text-xs p-6">No hay conversaciones</p>'
+                : filtered.map(c => `
+            <div onclick="openConversation('${c.id}')"
+                class="conversation-item p-4 border-b border-slate-800/60 cursor-pointer hover:bg-slate-800/40 transition-colors ${currentConversation?.id === c.id ? 'bg-slate-800/60' : ''}">
+                <div class="flex items-start gap-3">
+                    <div class="relative shrink-0">
+                        <div class="w-9 h-9 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-xs font-bold">${c.avatar}</div>
+                        ${c.unread > 0 ? `<span class="absolute -top-1 -right-1 w-4 h-4 bg-blue-500 rounded-full text-[9px] flex items-center justify-center font-bold">${c.unread}</span>` : ''}
+                    </div>
+                    <div class="flex-grow min-w-0">
+                        <div class="flex items-center justify-between">
+                            <span class="text-sm font-semibold truncate">${c.name}</span>
+                            <span class="text-[10px] text-slate-500 shrink-0 ml-2">${c.messages.at(-1)?.time || ''}</span>
+                        </div>
+                        <div class="text-[10px] text-slate-500 mb-1">
+                            <i class="fas ${c.channel === 'WhatsApp' ? 'fa-whatsapp text-green-400' : c.channel === 'Instagram' ? 'fa-instagram text-pink-400' : 'fa-globe text-blue-400'}"></i> ${c.channel}
+                        </div>
+                        <p class="text-xs text-slate-400 truncate">${c.messages.at(-1)?.text || ''}</p>
+                    </div>
+                </div>
+            </div>`).join('');
+
+            // Badge global de no leídos
+            const totalUnread = conversations.reduce((s, c) => s + c.unread, 0);
+            const badge = document.getElementById('inbox-badge');
+            badge.textContent = totalUnread;
+            badge.classList.toggle('hidden', totalUnread === 0);
+        }
+
+        function openConversation(id) {
+            currentConversation = conversations.find(c => c.id === id);
+            if (!currentConversation) return;
+
+            // Marcar como leído
+            currentConversation.unread = 0;
+            saveConversations();
+
+            document.getElementById('inbox-empty').classList.add('hidden');
+            document.getElementById('inbox-chat').classList.remove('hidden');
+            document.getElementById('inbox-avatar').textContent = currentConversation.avatar;
+            document.getElementById('inbox-name').textContent = currentConversation.name;
+            document.getElementById('inbox-channel').textContent = currentConversation.channel;
+
+            renderMessages();
+            renderConversationList(document.getElementById('inbox-search')?.value || '');
+        }
+
+        function renderMessages() {
+            if (!currentConversation) return;
+            const container = document.getElementById('inbox-messages');
+            container.innerHTML = currentConversation.messages.map(m => `
+            <div class="flex ${m.from === 'user' ? 'justify-end' : 'justify-start'}">
+                <div class="max-w-[75%] px-4 py-2.5 rounded-2xl text-sm ${m.from === 'user'
+                    ? 'bg-blue-600 text-white rounded-br-sm'
+                    : 'bg-slate-800 text-slate-200 rounded-bl-sm'} whitespace-pre-wrap leading-relaxed">
+                    ${m.text}
+                    <div class="text-[10px] mt-1 ${m.from === 'user' ? 'text-blue-200' : 'text-slate-500'} text-right">${m.time}</div>
+                </div>
+            </div>`).join('');
+            container.scrollTop = container.scrollHeight;
+        }
+
+        function sendInboxReply() {
+            const input = document.getElementById('inbox-reply');
+            const text = input.value.trim();
+            if (!text || !currentConversation) return;
+
+            const now = new Date().toLocaleTimeString('es-CO', { hour: '2-digit', minute: '2-digit' });
+            currentConversation.messages.push({ from: 'user', text, time: now });
+            input.value = '';
+            saveConversations();
+            renderMessages();
+            renderConversationList();
+        }
+
+        function filterConversations(val) {
+            renderConversationList(val);
+        }
+
+        /* ═══════════════════════════════════════════════════════════════════════
+           CRM KANBAN — Pipeline de leads con drag & drop y localStorage
+        ═══════════════════════════════════════════════════════════════════════ */
+
+        let leads = JSON.parse(localStorage.getItem('imago_leads') || '[]');
+        let draggedLeadId = null;
+
+        // Seed demo
+        if (leads.length === 0) {
+            leads = [
+                { id: 'l1', name: 'Ana Gómez', email: '', phone: '3001234567', service: 'Fotografía de Producto', notes: '50 productos para e-commerce', status: 'new', date: '17 May' },
+                { id: 'l2', name: 'Carlos Ruiz', email: 'carlos@mail.com', phone: '', service: 'Branding / Identidad Visual', notes: 'Logo para restaurante', status: 'progress', date: '16 May' },
+                { id: 'l3', name: 'María Torres', email: '', phone: '', service: 'Gestión de Redes Sociales', notes: 'Consulta por precios', status: 'new', date: '17 May' },
+            ];
+            saveLeads();
+        }
+
+        function saveLeads() {
+            localStorage.setItem('imago_leads', JSON.stringify(leads));
+        }
+
+        function renderKanban() {
+            ['new', 'progress', 'closed'].forEach(col => {
+                const container = document.getElementById(`cards-${col}`);
+                const colLeads = leads.filter(l => l.status === col);
+                document.getElementById(`count-${col}`).textContent = colLeads.length;
+
+                container.innerHTML = colLeads.length === 0
+                    ? `<div class="text-center text-slate-700 text-xs py-6 border-2 border-dashed border-slate-800 rounded-xl">Arrastra un lead aquí</div>`
+                    : colLeads.map(l => `
+                <div class="kanban-card bg-slate-900 border border-slate-800 rounded-2xl p-4 cursor-grab hover:border-slate-600 transition-all hover:shadow-lg hover:shadow-black/20 hover:-translate-y-0.5"
+                    draggable="true"
+                    ondragstart="dragCard('${l.id}')"
+                    ondragend="dragEnd()">
+                    <div class="flex items-start justify-between mb-2">
+                        <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-blue-600 to-purple-600 flex items-center justify-center text-xs font-bold shrink-0">
+                            ${l.name.split(' ').map(n => n[0]).join('').slice(0, 2)}
+                        </div>
+                        <button onclick="deleteLead('${l.id}')" class="text-slate-700 hover:text-red-400 transition-colors text-xs ml-2">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
+                    <div class="font-semibold text-sm">${l.name}</div>
+                    ${l.service ? `<div class="text-[10px] text-blue-400 mt-1">${l.service}</div>` : ''}
+                    ${l.phone ? `<div class="text-[10px] text-slate-500 mt-1"><i class="fas fa-phone mr-1"></i>${l.phone}</div>` : ''}
+                    ${l.email ? `<div class="text-[10px] text-slate-500"><i class="fas fa-envelope mr-1"></i>${l.email}</div>` : ''}
+                    ${l.notes ? `<div class="text-[11px] text-slate-400 mt-2 bg-slate-800/60 p-2 rounded-lg">${l.notes}</div>` : ''}
+                    <div class="text-[10px] text-slate-600 mt-2">${l.date}</div>
+                </div>`).join('');
+            });
+        }
+
+        function dragCard(id) {
+            draggedLeadId = id;
+            setTimeout(() => {
+                ['cards-new', 'cards-progress', 'cards-closed'].forEach(c => {
+                    document.getElementById(c).classList.add('drag-over-target');
+                });
+            }, 0);
+        }
+
+        function dragEnd() {
+            ['cards-new', 'cards-progress', 'cards-closed'].forEach(c => {
+                document.getElementById(c).classList.remove('drag-over-target');
+            });
+        }
+
+        function dropCard(event, newStatus) {
+            event.preventDefault();
+            if (!draggedLeadId) return;
+            const lead = leads.find(l => l.id === draggedLeadId);
+            if (lead) { lead.status = newStatus; saveLeads(); renderKanban(); }
+            draggedLeadId = null;
+        }
+
+        function moveToKanban(conv, status) {
+            if (!conv) return;
+            const exists = leads.find(l => l.id === conv.id);
+            if (!exists) {
+                leads.push({ id: conv.id, name: conv.name, email: '', phone: '', service: '', notes: `Desde ${conv.channel}`, status, date: new Date().toLocaleDateString('es-CO', { day: 'numeric', month: 'short' }) });
+            } else {
+                exists.status = status;
+            }
+            saveLeads();
+            renderKanban();
+            // Feedback visual
+            const btn = event.currentTarget;
+            const orig = btn.innerHTML;
+            btn.innerHTML = '<i class="fas fa-check mr-1"></i>¡Listo!';
+            setTimeout(() => btn.innerHTML = orig, 1500);
+        }
+
+        function showAddLeadModal() {
+            ['lead-name', 'lead-email', 'lead-phone', 'lead-notes'].forEach(id => document.getElementById(id).value = '');
+            document.getElementById('lead-service').value = '';
+            document.getElementById('lead-modal').classList.remove('hidden');
+        }
+
+        function closeLeadModal() {
+            document.getElementById('lead-modal').classList.add('hidden');
+        }
+
+        function saveLead() {
+            const name = document.getElementById('lead-name').value.trim();
+            if (!name) { document.getElementById('lead-name').focus(); return; }
+            leads.push({
+                id: 'l' + Date.now(),
+                name,
+                email: document.getElementById('lead-email').value.trim(),
+                phone: document.getElementById('lead-phone').value.trim(),
+                service: document.getElementById('lead-service').value,
+                notes: document.getElementById('lead-notes').value.trim(),
+                status: 'new',
+                date: new Date().toLocaleDateString('es-CO', { day: 'numeric', month: 'short' })
+            });
+            saveLeads();
+            renderKanban();
+            closeLeadModal();
+        }
+
+        function deleteLead(id) {
+            leads = leads.filter(l => l.id !== id);
+            saveLeads();
+            renderKanban();
+        }
+
+        // Inicializar al cargar
+        renderConversationList();
+        renderKanban();
+    </script>
+</body>
+
+</html>

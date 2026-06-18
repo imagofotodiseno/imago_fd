@@ -1,0 +1,51 @@
+# netlify.toml — Configuración principal para despliegue en Netlify
+# Repositorio: github.com/imagofotodiseno/imago_fd
+
+[build]
+  # Directorio que Netlify publicará como sitio estático
+  publish = "."
+  # Directorio donde viven las Netlify Functions
+  functions = "netlify/functions"
+  # No hay proceso de build (es HTML puro), pero si agregas React/Vite en el futuro:
+  # command = "npm run build"
+
+# ── Redireccionamientos (Rewrites) ───────────────────────────────────────────
+# Mapea las rutas del servidor Express a las Netlify Functions equivalentes.
+
+[[redirects]]
+  # El Web Widget y el panel interno usan esta ruta para hablar con el agente
+  from = "/api/chat/web"
+  to = "/.netlify/functions/chat"
+  status = 200
+  force = true
+
+[[redirects]]
+  # Meta enviará los eventos de WhatsApp a esta URL pública
+  from = "/webhook"
+  to = "/.netlify/functions/webhook"
+  status = 200
+  force = true
+
+[[redirects]]
+  # Fallback SPA: todas las rutas no encontradas vuelven al index.html
+  from = "/*"
+  to = "/index.html"
+  status = 200
+
+# ── Headers de Seguridad ─────────────────────────────────────────────────────
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Frame-Options = "SAMEORIGIN"
+    X-XSS-Protection = "1; mode=block"
+    X-Content-Type-Options = "nosniff"
+    Referrer-Policy = "strict-origin-when-cross-origin"
+
+# ── Variables de entorno (solo estructura, los valores van en el panel Netlify) ──
+# NO pongas valores reales aquí. Configúralos en:
+# Netlify Dashboard → Site settings → Environment variables
+#
+# GEMINI_API_KEY        = tu_api_key_de_gemini
+# META_VERIFY_TOKEN     = token_secreto_que_tu_eliges
+# META_ACCESS_TOKEN     = token_permanente_de_meta
+# WHATSAPP_PHONE_ID     = phone_number_id_de_meta

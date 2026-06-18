@@ -1,0 +1,111 @@
+:root {
+    --primary: #3b82f6;
+    --accent: #8b5cf6;
+    --bg-dark: #020617;
+    --card-bg: #0f172a;
+}
+
+body {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    background-color: var(--bg-dark);
+    color: #f8fafc;
+    overflow: hidden;
+}
+
+.glass {
+    background: rgba(15, 23, 42, 0.6);
+    backdrop-filter: blur(16px);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.sidebar-item.active {
+    background: rgba(59, 130, 246, 0.1);
+    color: #60a5fa;
+    border-right: 3px solid #3b82f6;
+}
+
+.glass-card {
+    background: rgba(15, 23, 42, 0.4);
+    backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.typing-indicator span {
+    height: 4px;
+    width: 4px;
+    background: #94a3b8;
+    display: inline-block;
+    border-radius: 50%;
+    margin: 0 1px;
+    animation: bounce 1.3s infinite;
+}
+
+@keyframes bounce {
+
+    0%,
+    60%,
+    100% {
+        transform: translateY(0);
+    }
+
+    30% {
+        transform: translateY(-4px);
+    }
+}
+
+::-webkit-scrollbar {
+    width: 5px;
+}
+
+::-webkit-scrollbar-thumb {
+    background: #334155;
+    border-radius: 10px;
+}
+
+/* ── Kanban ── */
+.kanban-col {
+    background: rgba(15, 23, 42, 0.3);
+    border: 1px solid rgba(255,255,255,0.04);
+    border-radius: 1.5rem;
+    padding: 1.25rem;
+    min-height: 500px;
+}
+
+.drag-over-target {
+    background: rgba(59, 130, 246, 0.06);
+    border: 2px dashed rgba(59, 130, 246, 0.3);
+    border-radius: 1rem;
+}
+
+.kanban-card {
+    transition: transform 0.15s ease, box-shadow 0.15s ease, border-color 0.15s ease;
+}
+
+.kanban-card:active {
+    cursor: grabbing;
+    transform: rotate(1deg) scale(1.02);
+    box-shadow: 0 20px 40px rgba(0,0,0,0.5);
+}
+
+/* ── Inbox layout ── */
+#view-inbox {
+    height: calc(100vh - 4rem); /* resta el header */
+    overflow: hidden;
+}
+
+#inbox-chat {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+}
+
+#inbox-messages {
+    flex: 1;
+    overflow-y: auto;
+}
+
+/* Sidebar item hover */
+.sidebar-item:not(.active):hover {
+    background: rgba(255,255,255,0.04);
+    color: #e2e8f0;
+}
