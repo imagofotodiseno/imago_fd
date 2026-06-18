@@ -1,11 +1,10 @@
-import express from 'express';
-import { supabase } from '../db/client.js';
+const express = require('express');
+const { supabase } = require('../db/client');
 
 const router = express.Router();
 
 router.get('/', async (req, res) => {
   try {
-    // Realizamos la consulta ordenando por la columna 'name' de manera ascendente
     const { data: contacts, error } = await supabase
       .from('contacts')
       .select('id, phone, name, var1, var2')
@@ -21,4 +20,4 @@ router.get('/', async (req, res) => {
   }
 });
 
-export default router;
+module.exports = router;
