@@ -5,52 +5,58 @@ export default function InboxPage() {
   const [activeChat, setActiveChat] = useState(null);
   const [replyText, setReplyText] = useState('');
   const [searchQuery, setSearchQuery] = useState('');
-  const [showChat, setShowChat] = useState(false); // controla la vista en móvil
+  const [showChat, setShowChat] = useState(false);
+  const [error, setError] = useState('');
 
   useEffect(() => {
-    let convs = JSON.parse(localStorage.getItem('imago_conversations') || '[]');
-    if (convs.length === 0) {
-      convs = [
-        {
-          id: 'wa_573001234567',
-          name: 'Ana Gómez',
-          channel: 'WhatsApp',
-          avatar: 'AG',
-          status: 'new',
-          unread: 2,
-          messages: [
-            { from: 'client', text: 'Hola! ¿Hacen sesiones de fotos para e-commerce?', time: '10:15' },
-            { from: 'bot', text: '¡Hola Ana! Sí, somos especialistas en fotografía de producto 📸. ¿Cuántos productos necesitas fotografiar?', time: '10:15' },
-            { from: 'client', text: 'Tengo como 50 productos para mi tienda de ropa', time: '10:17' },
-          ]
-        },
-        {
-          id: 'web_abc123',
-          name: 'Carlos Ruiz',
-          channel: 'Web Chat',
-          avatar: 'CR',
-          status: 'progress',
-          unread: 0,
-          messages: [
-            { from: 'client', text: 'Necesito un logo para mi restaurante', time: 'Ayer' },
-            { from: 'bot', text: '¡Con gusto! 🎨 ¿Tienes algún estilo o referencia en mente para el diseño?', time: 'Ayer' },
-          ]
-        },
-        {
-          id: 'ig_987654',
-          name: 'María Torres',
-          channel: 'Instagram',
-          avatar: 'MT',
-          status: 'new',
-          unread: 1,
-          messages: [
-            { from: 'client', text: '¿Cuánto vale el paquete de redes sociales?', time: '09:30' },
-          ]
-        },
-      ];
-      localStorage.setItem('imago_conversations', JSON.stringify(convs));
+    try {
+      let convs = JSON.parse(localStorage.getItem('imago_conversations') || '[]');
+      if (convs.length === 0) {
+        convs = [
+          {
+            id: 'wa_573001234567',
+            name: 'Ana Gómez',
+            channel: 'WhatsApp',
+            avatar: 'AG',
+            status: 'new',
+            unread: 2,
+            messages: [
+              { from: 'client', text: 'Hola! ¿Hacen sesiones de fotos para e-commerce?', time: '10:15' },
+              { from: 'bot', text: '¡Hola Ana! Sí, somos especialistas en fotografía de producto 📸. ¿Cuántos productos necesitas fotografiar?', time: '10:15' },
+              { from: 'client', text: 'Tengo como 50 productos para mi tienda de ropa', time: '10:17' },
+            ]
+          },
+          {
+            id: 'web_abc123',
+            name: 'Carlos Ruiz',
+            channel: 'Web Chat',
+            avatar: 'CR',
+            status: 'progress',
+            unread: 0,
+            messages: [
+              { from: 'client', text: 'Necesito un logo para mi restaurante', time: 'Ayer' },
+              { from: 'bot', text: '¡Con gusto! 🎨 ¿Tienes algún estilo o referencia en mente para el diseño?', time: 'Ayer' },
+            ]
+          },
+          {
+            id: 'ig_987654',
+            name: 'María Torres',
+            channel: 'Instagram',
+            avatar: 'MT',
+            status: 'new',
+            unread: 1,
+            messages: [
+              { from: 'client', text: '¿Cuánto vale el paquete de redes sociales?', time: '09:30' },
+            ]
+          },
+        ];
+        localStorage.setItem('imago_conversations', JSON.stringify(convs));
+      }
+      setConversations(convs);
+    } catch (e) {
+      console.error('Error cargando conversaciones:', e);
+      setError('Error al cargar conversaciones');
     }
-    setConversations(convs);
   }, []);
 
   const saveConversations = (updated) => {
@@ -72,7 +78,11 @@ export default function InboxPage() {
   };
 
   const handleSendReply = () => {
-    if (!replyText.trim() || !activeChat) return;
+    if (!replyText.trim() || !activeChat) {
+      setError('Escribe un mensaje válido');
+      return;
+    }
+    setError('');
     const now = new Date().toLocaleTimeString('es-CO', { hour: '2-digit', minute: '2-digit' });
     const newMsg = { from: 'user', text: replyText, time: now };
     const updated = conversations.map(c =>
@@ -113,7 +123,14 @@ export default function InboxPage() {
   );
 
   return (
-    <div className="flex-grow flex h-full bg-slate-950 text-slate-100 overflow-hidden">
+    <div className="flex-grow flex flex-col h-full bg-slate-950 text-slate-100 overflow-hidden">
+      {error && (
+        <div className="bg-red-600/20 border-b border-red-600/50 px-4 py-2 text-red-400 text-sm flex items-center justify-between">
+          <span>{error}</span>
+          <button onClick={() => setError('')} className="text-red-400 hover:text-red-300">✕</button>
+        </div>
+      )}
+      <div className="flex-grow flex h-full overflow-hidden">
 
       {/* ── Panel de lista de conversaciones ── */}
       <div className={`
@@ -280,6 +297,7 @@ export default function InboxPage() {
         )}
       </div>
 
+      </div>
     </div>
   );
 }

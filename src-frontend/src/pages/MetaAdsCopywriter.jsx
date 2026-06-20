@@ -12,13 +12,13 @@ export default function MetaAdsCopywriter() {
 
   const generateAdCopy = async () => {
     if (!service.trim()) {
-      alert('Por favor ingresa el servicio o producto.');
+      setCopyResult('❌ Por favor ingresa el servicio o producto.');
       return;
     }
 
     setLoading(true);
     setImageLoading(true);
-    setCopyResult('');
+    setCopyResult('📝 Generando copy persuasivo...');
     setImageUrl('');
     setImagePromptUsed('');
 
@@ -27,21 +27,42 @@ export default function MetaAdsCopywriter() {
       
       // 1. Generar Copy Persuasivo (Fórmula AIDA)
       const copyPrompt = `Crea un anuncio AIDA persuasivo para Meta Ads (Facebook/Instagram) sobre: "${service.trim()}". Dirigido a: "${targetAudience}". Incluye: Emojis, un gancho (Hook) muy atractivo en la primera línea, descripción del valor/solución, y un Call to Action (CTA) claro.`;
-      const copyPromise = geminiGenerate({
-        prompt: copyPrompt,
-        system: "Copywriter Experto en Meta Ads y Redacción Persuasiva."
-      });
-
-      // 2. Generar el Prompt en Inglés para la imagen de IA
-      const imagePromptGen = `Create a highly detailed, photorealistic image prompt (in english) for an ad about: "${service.trim()}" targeted to "${targetAudience}". The image should be commercial, high quality, and visually striking. Just return the english prompt, no other text or explanation.`;
-      const imagePromise = geminiGenerate({
-        prompt: imagePromptGen,
-        system: "Expert Midjourney Prompt Engineer"
-      });
-
-      const [copyResponse, imageResponse] = await Promise.all([copyPromise, imagePromise]);
+      
+      let copyResponse;
+      try {
+        copyResponse = await geminiGenerate({
+          prompt: copyPrompt,
+          system: "Copywriter Experto en Meta Ads y Redacción Persuasiva."
+        });
+        if (!copyResponse || !copyResponse.text) {
+          throw new Error('Respuesta vacía del API');
+        }
+      } catch (copyErr) {
+        throw new Error(`Error generando copy: ${copyErr.message}`);
+      }
 
       setCopyResult(copyResponse.text);
+      
+      // 2. Generar el Prompt en Inglés para la imagen de IA
+      setCopyResult(prev => prev + '\n\n🖼️ Generando diseño visual...');
+      
+      const imagePromptGen = `Create a highly detailed, photorealistic image prompt (in english) for an ad about: "${service.trim()}" targeted to "${targetAudience}". The image should be commercial, high quality, and visually striking. Just return the english prompt, no other text or explanation.`;
+      
+      let imageResponse;
+      try {
+        imageResponse = await geminiGenerate({
+          prompt: imagePromptGen,
+          system: "Expert Midjourney Prompt Engineer"
+        });
+        if (!imageResponse || !imageResponse.text) {
+          throw new Error('Respuesta vacía del API');
+        }
+      } catch (imgErr) {
+        console.warn('Error generando imagen:', imgErr.message);
+        setImagePromptUsed('No se pudo generar automáticamente');
+        setImageLoading(false);
+        return;
+      }
       
       const rawPrompt = imageResponse.text.trim();
       setImagePromptUsed(rawPrompt);
@@ -52,8 +73,8 @@ export default function MetaAdsCopywriter() {
       setImageUrl(pollUrl);
 
     } catch (err) {
-      console.error(err);
-      setCopyResult(`Error al generar copy: ${err.message}`);
+      console.error('Error en generateAdCopy:', err);
+      setCopyResult(`❌ ${err.message || 'Error desconocido. Intenta nuevamente o verifica tu API Key.'}`);
       setImageLoading(false);
     } finally {
       setLoading(false);

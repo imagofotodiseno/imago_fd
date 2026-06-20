@@ -38,17 +38,21 @@ export default function ChatbotExperto() {
     setLoading(true);
 
     try {
+      // Obtener API key del localStorage como fallback
+      const apiKey = typeof window !== 'undefined' ? localStorage.getItem('imago_gemini_key') : null;
+      
       // Llamada al endpoint local de chat que interconecta con el orquestador
       const response = await apiCall('POST', '/api/chat/web', {
         senderId,
-        message: text
+        message: text,
+        apiKey: apiKey || undefined
       });
 
       // Agregar respuesta del bot
       setMessages(prev => [...prev, { role: 'assistant', content: response.reply }]);
     } catch (err) {
       console.error(err);
-      setMessages(prev => [...prev, { role: 'assistant', content: `Error: No se pudo obtener respuesta del agente. (${err.message || 'Verifica la conexión con el servidor'})` }]);
+      setMessages(prev => [...prev, { role: 'assistant', content: `❌ Error: No se pudo obtener respuesta del agente. ${err.message || 'Verifica: 1) Conexión con servidor, 2) API Key configurada en Configuración'}` }]);
     } finally {
       setLoading(false);
     }
