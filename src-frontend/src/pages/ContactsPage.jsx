@@ -167,6 +167,21 @@ export default function ContactsPage() {
           </table>
         )}
       </div>
+
+      {!showCreateForm && (
+        <button
+          type="button"
+          onClick={() => {
+            setFormError('');
+            setShowCreateForm(true);
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+          }}
+          className="fixed bottom-6 right-6 z-40 inline-flex items-center gap-2 rounded-full bg-emerald-600 px-5 py-3 text-white font-semibold shadow-lg hover:bg-emerald-700 transition-colors"
+        >
+          <i className="fas fa-plus" />
+          Agregar contacto
+        </button>
+      )}
     </div>
   );
 }
