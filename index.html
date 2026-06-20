@@ -341,8 +341,8 @@
         }
 
         async function fetchGemini(prompt, system = "", useSearch = false) {
-            // 1. Apuntamos directamente a la URL de tu backend local
-            const url = "http://localhost:3000/api/gemini";
+            // 1. Usamos la ruta relativa para que funcione en local y en producción
+            const url = "/api/gemini";
             const currentApiKey = localStorage.getItem('imago_gemini_key') || "";
 
             try {
