@@ -48,7 +48,16 @@ export const pingMeta = () => request(`${BASE}/meta/ping`, { method: 'POST' });
 export const syncTemplates = () => request(`${BASE}/meta/templates/sync`, { method: 'POST' });
 export const getTemplates = () => request(`${BASE}/templates`);
 export const getContacts = () => request(`${BASE}/contacts`);
-export const geminiGenerate = (body) => request(`${BASE}/gemini`, { method: 'POST', body });
+export const geminiGenerate = (body) => {
+  const localApiKey = typeof window !== 'undefined' ? localStorage.getItem('imago_gemini_key') : null;
+  return request(`${BASE}/gemini`, {
+    method: 'POST',
+    body: {
+      ...body,
+      apiKey: body?.apiKey || localApiKey || undefined
+    }
+  });
+};
 export const getAppointments = () => request(`${BASE}/appointments`);
 export const createAppointment = (body) => request(`${BASE}/appointments`, { method: 'POST', body });
 export const createCampaign = (body) => request(`${BASE}/campaigns`, { method: 'POST', body });

@@ -19,6 +19,13 @@ export default function StrategicAgent() {
   const [syncStep, setSyncStep] = useState(0); // 0: idle, 1: research, 2: audience, 3: strategy
   const [copied, setCopied] = useState(false);
 
+  const getTextFromResponse = (data) => {
+    if (data && typeof data.text === 'string' && data.text.trim()) {
+      return data.text;
+    }
+    throw new Error(data?.error || 'La API no devolvio texto util.');
+  };
+
   const runMarketResearch = async (overrideTopic) => {
     const topic = (typeof overrideTopic === 'string' ? overrideTopic : researchInput).trim() || "marketing digital y diseño en Colombia";
     setLoading(true);
@@ -28,13 +35,14 @@ export default function StrategicAgent() {
       const system = "Analista de Mercado Estratégico. Devuelve respuestas detalladas en español estructuradas con viñetas claras.";
       const prompt = `Analiza las tendencias actuales sobre: "${topic}". Dame un resumen en bullet points de lo que funciona ahora y qué pasos exactos seguir para aprovechar estas tendencias.`;
       const data = await geminiGenerate({ prompt, system, useSearch: true });
+      const text = getTextFromResponse(data);
       
-      setResult(data.text);
+      setResult(text);
       setStrategyContext(prev => ({
         ...prev,
-        investigacionData: data.text
+        investigacionData: text
       }));
-      return data.text;
+      return text;
     } catch (err) {
       const errMsg = `Error: ${err.message}`;
       setResult(errMsg);
@@ -61,13 +69,14 @@ ${activeResearchContext}`;
 
       const prompt = `Define 2 perfiles de público objetivo (Buyer Personas) ideales para: "${topic}". Incluye para cada uno: nombre, edad, intereses, dolores principales, y qué pasos estratégicos seguir para conectar con ellos y venderles.`;
       const data = await geminiGenerate({ prompt, system, useSearch: false });
+      const text = getTextFromResponse(data);
       
-      setResult(data.text);
+      setResult(text);
       setStrategyContext(prev => ({
         ...prev,
-        publicosData: data.text
+        publicosData: text
       }));
-      return data.text;
+      return text;
     } catch (err) {
       const errMsg = `Error: ${err.message}`;
       setResult(errMsg);
@@ -100,13 +109,14 @@ ${activeResearchContext}`;
 
       const prompt = `Crea una estrategia de contenido accionable para: "${topic}". Define 3 pilares de contenido y detalla una lista de pasos a seguir para ejecutar esta estrategia con éxito esta semana.`;
       const data = await geminiGenerate({ prompt, system, useSearch: false });
+      const text = getTextFromResponse(data);
       
-      setResult(data.text);
+      setResult(text);
       setStrategyContext(prev => ({
         ...prev,
-        estrategiaFinal: data.text
+        estrategiaFinal: text
       }));
-      return data.text;
+      return text;
     } catch (err) {
       const errMsg = `Error: ${err.message}`;
       setResult(errMsg);
