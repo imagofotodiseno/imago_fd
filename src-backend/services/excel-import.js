@@ -7,7 +7,7 @@
 const ExcelJS = require('exceljs');
 const fs = require('fs');
 const path = require('path');
-const { openDatabase } = require('../db/client');
+const { openDatabase, supabase, isSupabaseConfigured } = require('../db/client');
 const { normalizePhone, normalizeBatch, sanitizeString } = require('./phone-normalizer');
 
 const uploadDir = path.join(__dirname, '..', 'uploads');
@@ -169,56 +169,91 @@ const previewImport = async (filePath, mapping, defaultCountry = '+57') => {
  * @returns {Promise<{ totalRows: number, imported: number, rejected: number, errorLogs: object[] }>}
  */
 const commitImport = async (filePath, mapping, defaultCountry = '+57', source = 'excel') => {
-  const db = openDatabase();
-
-  // Additive migration: ensure custom_vars_json column exists
-  try {
-    await db.run('ALTER TABLE contacts ADD COLUMN custom_vars_json TEXT');
-  } catch (_) {
-    // Column already exists — safe to ignore
-  }
-
   const { validRecords, errorLogs, totalRows } = await previewImport(filePath, mapping, defaultCountry);
 
-  const insertSql = `
-    INSERT OR IGNORE INTO contacts
-      (phone, country_code, name, var1, var2, custom_vars_json, source, updated_at)
-    VALUES (?, ?, ?, ?, ?, ?, ?, datetime('now'))
-  `;
+  if (isSupabaseConfigured) {
+    const contactsPayload = validRecords.map((record) => ({
+      phone: record.normalizedPhone,
+      country_code: defaultCountry,
+      name: record.name,
+      var1: record.mergeTags?.var1 || '',
+      var2: record.mergeTags?.var2 || '',
+      custom_vars_json: record.mergeTags || {},
+      source,
+      updated_at: new Date().toISOString()
+    }));
 
-  for (const record of validRecords) {
-    const var1 = record.mergeTags?.var1 || '';
-    const var2 = record.mergeTags?.var2 || '';
-    const customVarsJson = JSON.stringify(record.mergeTags || {});
-    await db.run(insertSql, [
-      record.normalizedPhone,
-      defaultCountry,
-      record.name,
-      var1,
-      var2,
-      customVarsJson,
-      source
+    if (contactsPayload.length) {
+      const { error: upsertError } = await supabase
+        .from('contacts')
+        .upsert(contactsPayload, { onConflict: 'phone', ignoreDuplicates: true });
+
+      if (upsertError) throw upsertError;
+    }
+
+    const duplicatesCount = errorLogs.filter((e) => e.error.includes('duplicado') || e.error.includes('Duplicado')).length;
+    const { error: jobError } = await supabase
+      .from('import_jobs')
+      .insert({
+        filename: path.basename(filePath),
+        mapping_json: JSON.stringify(mapping),
+        rows_total: totalRows,
+        rows_valid: validRecords.length,
+        rows_invalid: errorLogs.length,
+        duplicates_count: duplicatesCount,
+        errors_json: JSON.stringify(errorLogs)
+      });
+
+    if (jobError) throw jobError;
+  } else {
+    const db = openDatabase();
+
+    // Additive migration: ensure custom_vars_json column exists
+    try {
+      await db.run('ALTER TABLE contacts ADD COLUMN custom_vars_json TEXT');
+    } catch (_) {
+      // Column already exists — safe to ignore
+    }
+
+    const insertSql = `
+      INSERT OR IGNORE INTO contacts
+        (phone, country_code, name, var1, var2, custom_vars_json, source, updated_at)
+      VALUES (?, ?, ?, ?, ?, ?, ?, datetime('now'))
+    `;
+
+    for (const record of validRecords) {
+      const var1 = record.mergeTags?.var1 || '';
+      const var2 = record.mergeTags?.var2 || '';
+      const customVarsJson = JSON.stringify(record.mergeTags || {});
+      await db.run(insertSql, [
+        record.normalizedPhone,
+        defaultCountry,
+        record.name,
+        var1,
+        var2,
+        customVarsJson,
+        source
+      ]);
+    }
+
+    const jobSql = `
+      INSERT INTO import_jobs
+        (filename, mapping_json, rows_total, rows_valid, rows_invalid, duplicates_count, errors_json)
+      VALUES (?, ?, ?, ?, ?, ?, ?)
+    `;
+    const duplicatesCount = errorLogs.filter((e) => e.error.includes('duplicado') || e.error.includes('Duplicado')).length;
+    await db.run(jobSql, [
+      path.basename(filePath),
+      JSON.stringify(mapping),
+      totalRows,
+      validRecords.length,
+      errorLogs.length,
+      duplicatesCount,
+      JSON.stringify(errorLogs)
     ]);
+
+    await db.close();
   }
-
-  // Log the import job
-  const jobSql = `
-    INSERT INTO import_jobs
-      (filename, mapping_json, rows_total, rows_valid, rows_invalid, duplicates_count, errors_json)
-    VALUES (?, ?, ?, ?, ?, ?, ?)
-  `;
-  const duplicatesCount = errorLogs.filter((e) => e.error.includes('duplicado') || e.error.includes('Duplicado')).length;
-  await db.run(jobSql, [
-    path.basename(filePath),
-    JSON.stringify(mapping),
-    totalRows,
-    validRecords.length,
-    errorLogs.length,
-    duplicatesCount,
-    JSON.stringify(errorLogs)
-  ]);
-
-  await db.close();
 
   return {
     totalRows,

@@ -1,42 +1,94 @@
 const express = require('express');
-const { openDatabase } = require('../db/client');
+const { supabase } = require('../db/client');
 const { getMetaConfig, sendWhatsAppMessage } = require('../services/meta-service');
 const { normalizePhone } = require('../services/phone-normalizer');
 
 const router = express.Router();
 
+// 1. Obtener todas las citas (con JOIN de contactos)
 router.get('/', async (req, res) => {
-  const db = openDatabase();
   try {
-    const appointments = await db.all(`
-      SELECT a.*, c.name AS contact_name, c.phone AS contact_phone, c.var1, c.var2
-      FROM appointments a
-      LEFT JOIN contacts c ON c.id = a.contact_id
-      ORDER BY a.starts_at DESC
-    `);
-    res.json({ appointments });
+    const { data: appointments, error } = await supabase
+      .from('appointments')
+      .select(`
+        *,
+        contacts (
+          name,
+          phone,
+          var1,
+          var2
+        )
+      `)
+      .order('starts_at', { ascending: false });
+
+    if (error) throw error;
+
+    // Aplanamos la respuesta para mantener la compatibilidad con tu estructura anterior
+    const formattedAppointments = appointments.map(app => ({
+      ...app,
+      contact_name: app.contacts ? app.contacts.name : null,
+      contact_phone: app.contacts ? app.contacts.phone : null,
+      var1: app.contacts ? app.contacts.var1 : null,
+      var2: app.contacts ? app.contacts.var2 : null
+    }));
+
+    res.json({ appointments: formattedAppointments });
   } catch (err) {
     res.status(500).json({ error: err.message });
-  } finally {
-    await db.close();
   }
 });
 
+// 2. Crear una nueva cita (e insertar contacto si no existe)
 router.post('/', async (req, res) => {
   const { phone, name, service, starts_at, ends_at, defaultCountry } = req.body;
   const normalized = normalizePhone(phone, defaultCountry || '+57');
+  
   if (!normalized.valid) {
     return res.status(400).json({ error: normalized.error });
   }
+  
   const cleanPhone = normalized.phone;
-  const db = openDatabase();
+
   try {
-    let contact = await db.get('SELECT * FROM contacts WHERE phone = ?', [cleanPhone]);
+    // Buscar si el contacto ya existe por su teléfono
+    let { data: contact, error: contactError } = await supabase
+      .from('contacts')
+      .select('*')
+      .eq('phone', cleanPhone)
+      .maybeSingle(); // Retorna null si no encuentra filas en vez de lanzar error
+
+    if (contactError) throw contactError;
+
+    // Si no existe, lo creamos
     if (!contact) {
-      const result = await db.run('INSERT INTO contacts (phone, name, source, created_at, updated_at) VALUES (?, ?, ?, datetime(\'now\'), datetime(\'now\'))', [cleanPhone, name, 'appointment']);
-      contact = { id: result.lastID, phone: cleanPhone, name };
+      const { data: newContact, error: insertContactError } = await supabase
+        .from('contacts')
+        .insert([{ phone: cleanPhone, name, source: 'appointment' }])
+        .select()
+        .single();
+
+      if (insertContactError) throw insertContactError;
+      contact = newContact;
     }
-    const appointmentResult = await db.run('INSERT INTO appointments (contact_id, service, starts_at, ends_at, status, created_at, updated_at) VALUES (?, ?, ?, ?, ?, datetime(\'now\'), datetime(\'now\'))', [contact.id, service, starts_at, ends_at, 'scheduled']);
+
+    // Insertar la cita asignando el contact_id correspondiente
+    const { data: newAppointment, error: appError } = await supabase
+      .from('appointments')
+      .insert([
+        {
+          contact_id: contact.id,
+          service,
+          starts_at,
+          ends_at,
+          status: 'scheduled'
+        }
+      ])
+      .select()
+      .single();
+
+    if (appError) throw appError;
+
+    // Enviar notificación por WhatsApp
     const config = await getMetaConfig();
     await sendWhatsAppMessage({
       access_token: config.access_token,
@@ -45,27 +97,37 @@ router.post('/', async (req, res) => {
       templateName: 'utility_confirmation',
       language: 'es',
       components: [
-        { type: 'body', parameters: [{ type: 'text', text: name }, { type: 'text', text: service }, { type: 'text', text: starts_at }] }
+        { 
+          type: 'body', 
+          parameters: [
+            { type: 'text', text: name }, 
+            { type: 'text', text: service }, 
+            { type: 'text', text: starts_at }
+          ] 
+        }
       ]
     });
-    res.json({ appointmentId: appointmentResult.lastID });
+
+    res.json({ appointmentId: newAppointment.id });
   } catch (err) {
     res.status(500).json({ error: err.message });
-  } finally {
-    await db.close();
   }
 });
 
+// 3. Confirmar una cita cambiándole el estado
 router.post('/:id/confirm', async (req, res) => {
   const { id } = req.params;
-  const db = openDatabase();
   try {
-    await db.run('UPDATE appointments SET status = ?, updated_at = datetime(\'now\') WHERE id = ?', ['confirmed', id]);
+    const { error } = await supabase
+      .from('appointments')
+      .update({ status: 'confirmed', updated_at: new Date().toISOString() })
+      .eq('id', id);
+
+    if (error) throw error;
+
     res.json({ ok: true });
   } catch (err) {
     res.status(500).json({ error: err.message });
-  } finally {
-    await db.close();
   }
 });
 

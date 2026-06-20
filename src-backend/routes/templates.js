@@ -1,18 +1,33 @@
 const express = require('express');
-const { openDatabase } = require('../db/client');
+const { openDatabase, supabase, isSupabaseConfigured } = require('../db/client');
 const { syncTemplates, getMetaConfig } = require('../services/meta-service');
 
 const router = express.Router();
 
 router.get('/', async (req, res) => {
-  const db = openDatabase();
   try {
-    const templates = await db.all('SELECT * FROM templates ORDER BY name');
+    let templates = [];
+
+    if (isSupabaseConfigured) {
+      const { data, error } = await supabase
+        .from('templates')
+        .select('*')
+        .order('name', { ascending: true });
+
+      if (error) throw error;
+      templates = data || [];
+    } else {
+      const db = openDatabase();
+      try {
+        templates = await db.all('SELECT * FROM templates ORDER BY name');
+      } finally {
+        await db.close();
+      }
+    }
+
     res.json({ templates });
   } catch (err) {
     res.status(500).json({ error: err.message });
-  } finally {
-    await db.close();
   }
 });
 
